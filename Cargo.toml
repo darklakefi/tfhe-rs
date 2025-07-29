@@ -10,6 +10,7 @@ members = [
     "tfhe-csprng",
     "backends/tfhe-cuda-backend",
     "backends/tfhe-hpu-backend",
+    "backends/tfhe-rocm-backend",
     "utils/tfhe-versionable",
     "utils/tfhe-versionable-derive",
     "utils/param_dedup",

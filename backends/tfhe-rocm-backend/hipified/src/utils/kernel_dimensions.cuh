@@ -1,8 +1,6 @@
 #ifndef KERNEL_DIMENSIONS_CUH
 #define KERNEL_DIMENSIONS_CUH
 
-#include <algorithm>
-
 inline int nextPow2(int x) {
   --x;
   x |= x >> 1;
@@ -16,7 +14,7 @@ inline int nextPow2(int x) {
 inline void getNumBlocksAndThreads(const int n, const int maxBlockSize,
                                    int &blocks, int &threads) {
   threads =
-      (n < maxBlockSize * 2) ? std::max(128, nextPow2((n + 1) / 2)) : maxBlockSize;
+      (n < maxBlockSize * 2) ? max(128, nextPow2((n + 1) / 2)) : maxBlockSize;
   blocks = (n + threads - 1) / threads;
 }
 
@@ -26,7 +24,7 @@ inline void getNumBlocksAndThreads2D(const int n, const int maxBlockSize,
                                      const int block_dim_y, int &blocks,
                                      int &threads_x) {
   const int max_block_dim_x = maxBlockSize / block_dim_y;
-  threads_x = (n < max_block_dim_x * 2) ? std::max(128, nextPow2((n + 1) / 2))
+  threads_x = (n < max_block_dim_x * 2) ? max(128, nextPow2((n + 1) / 2))
                                         : max_block_dim_x;
   blocks = (n + threads_x - 1) / threads_x;
 }
