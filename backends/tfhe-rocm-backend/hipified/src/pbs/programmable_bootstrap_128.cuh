@@ -17,7 +17,7 @@ execute_scratch_pbs_128(void *stream, uint32_t gpu_index, int8_t **pbs_buffer,
 }
 template <typename Torus>
 static void execute_pbs_128_async(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, const LweArrayVariant<__uint128_t> &lwe_array_out,
     const std::vector<Torus *> lut_vector,
     const LweArrayVariant<uint64_t> &lwe_array_in,

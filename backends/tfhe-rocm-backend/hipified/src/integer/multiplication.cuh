@@ -274,7 +274,7 @@ __global__ void fill_radix_from_lsb_msb(Torus *result_blocks, Torus *lsb_blocks,
 
 template <typename Torus>
 __host__ uint64_t scratch_cuda_integer_partial_sum_ciphertexts_vec_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_sum_ciphertexts_vec_memory<Torus> **mem_ptr,
     uint32_t num_blocks_in_radix, uint32_t max_num_radix_in_vec,
     bool reduce_degrees_for_single_carry_propagation, int_radix_params params,
@@ -290,7 +290,7 @@ __host__ uint64_t scratch_cuda_integer_partial_sum_ciphertexts_vec_kb(
 
 template <typename Torus>
 __host__ void host_integer_partial_sum_ciphertexts_vec_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *radix_lwe_out,
     CudaRadixCiphertextFFI *terms, void *const *bsks, uint64_t *const *ksks,
     CudaModulusSwitchNoiseReductionKeyFFI const *ms_noise_reduction_key,
@@ -540,7 +540,7 @@ __host__ void host_integer_partial_sum_ciphertexts_vec_kb(
 
 template <typename Torus, class params>
 __host__ void host_integer_mult_radix_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *radix_lwe_out,
     CudaRadixCiphertextFFI const *radix_lwe_left, bool const is_bool_left,
     CudaRadixCiphertextFFI const *radix_lwe_right, bool const is_bool_right,
@@ -685,7 +685,7 @@ __host__ void host_integer_mult_radix_kb(
 
 template <typename Torus>
 __host__ uint64_t scratch_cuda_integer_mult_radix_ciphertext_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_mul_memory<Torus> **mem_ptr,
     bool const is_boolean_left, bool const is_boolean_right,
     uint32_t num_radix_blocks, int_radix_params params,

@@ -34,7 +34,7 @@ device_accumulate_all_blocks(Torus *output, Torus const *input_block,
 }
 
 template <typename Torus>
-__host__ void accumulate_all_blocks(cudaStream_t stream, uint32_t gpu_index,
+__host__ void accumulate_all_blocks(hipStream_t stream, uint32_t gpu_index,
                                     Torus *output, Torus const *input,
                                     uint32_t lwe_dimension,
                                     uint32_t num_radix_blocks) {
@@ -58,7 +58,7 @@ __host__ void accumulate_all_blocks(cudaStream_t stream, uint32_t gpu_index,
  */
 template <typename Torus>
 __host__ void are_all_comparisons_block_true(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in,
     int_comparison_buffer<Torus> *mem_ptr, void *const *bsks,
@@ -186,7 +186,7 @@ __host__ void are_all_comparisons_block_true(
  */
 template <typename Torus>
 __host__ void is_at_least_one_comparisons_block_true(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in,
     int_comparison_buffer<Torus> *mem_ptr, void *const *bsks,
@@ -260,7 +260,7 @@ __host__ void is_at_least_one_comparisons_block_true(
 
 template <typename Torus>
 __host__ void host_compare_blocks_with_zero(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in,
     int_comparison_buffer<Torus> *mem_ptr, void *const *bsks,
@@ -330,7 +330,7 @@ __host__ void host_compare_blocks_with_zero(
 
 template <typename Torus>
 __host__ void host_integer_radix_equality_check_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_1,
     CudaRadixCiphertextFFI const *lwe_array_2,
@@ -362,7 +362,7 @@ __host__ void host_integer_radix_equality_check_kb(
 
 template <typename Torus>
 __host__ void compare_radix_blocks_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_left,
     CudaRadixCiphertextFFI const *lwe_array_right,
@@ -418,7 +418,7 @@ __host__ void compare_radix_blocks_kb(
 // final sign
 template <typename Torus>
 __host__ void tree_sign_reduction(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI *lwe_block_comparisons,
     int_tree_sign_reduction_buffer<Torus> *tree_buffer,
@@ -509,7 +509,7 @@ __host__ void tree_sign_reduction(
 
 template <typename Torus>
 __host__ void host_integer_radix_difference_check_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_left,
     CudaRadixCiphertextFFI const *lwe_array_right,
@@ -676,7 +676,7 @@ __host__ void host_integer_radix_difference_check_kb(
 
 template <typename Torus>
 __host__ uint64_t scratch_cuda_integer_radix_comparison_check_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_comparison_buffer<Torus> **mem_ptr,
     uint32_t num_radix_blocks, int_radix_params params, COMPARISON_TYPE op,
     bool is_signed, bool allocate_gpu_memory) {
@@ -690,7 +690,7 @@ __host__ uint64_t scratch_cuda_integer_radix_comparison_check_kb(
 
 template <typename Torus>
 __host__ void host_integer_radix_maxmin_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_left,
     CudaRadixCiphertextFFI const *lwe_array_right,
@@ -723,7 +723,7 @@ __host__ void host_integer_radix_maxmin_kb(
 
 template <typename Torus>
 __host__ void host_integer_are_all_comparisons_block_true_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in,
     int_comparison_buffer<Torus> *mem_ptr, void *const *bsks,
@@ -740,7 +740,7 @@ __host__ void host_integer_are_all_comparisons_block_true_kb(
 
 template <typename Torus>
 __host__ void host_integer_is_at_least_one_comparisons_block_true_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in,
     int_comparison_buffer<Torus> *mem_ptr, void *const *bsks,

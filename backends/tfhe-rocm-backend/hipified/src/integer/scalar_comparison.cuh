@@ -26,7 +26,7 @@ Torus is_x_less_than_y_given_input_borrow(Torus last_x_block,
 
 template <typename Torus>
 __host__ void scalar_compare_radix_blocks_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI *lwe_array_in, Torus *scalar_blocks,
     int_comparison_buffer<Torus> *mem_ptr, void *const *bsks,
@@ -89,7 +89,7 @@ __host__ void scalar_compare_radix_blocks_kb(
 
 template <typename Torus>
 __host__ void integer_radix_unsigned_scalar_difference_check_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in, Torus const *scalar_blocks,
     Torus const *h_scalar_blocks, int_comparison_buffer<Torus> *mem_ptr,
@@ -336,7 +336,7 @@ __host__ void integer_radix_unsigned_scalar_difference_check_kb(
 
 template <typename Torus>
 __host__ void integer_radix_signed_scalar_difference_check_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in, Torus const *scalar_blocks,
     Torus const *h_scalar_blocks, int_comparison_buffer<Torus> *mem_ptr,
@@ -669,7 +669,7 @@ __host__ void integer_radix_signed_scalar_difference_check_kb(
 
 template <typename Torus>
 __host__ void host_integer_radix_scalar_difference_check_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in, Torus const *scalar_blocks,
     Torus const *h_scalar_blocks, int_comparison_buffer<Torus> *mem_ptr,
@@ -700,7 +700,7 @@ __host__ void host_integer_radix_scalar_difference_check_kb(
 
 template <typename Torus>
 __host__ void host_integer_radix_scalar_maxmin_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in, Torus const *scalar_blocks,
     Torus const *h_scalar_blocks, int_comparison_buffer<Torus> *mem_ptr,
@@ -747,7 +747,7 @@ __host__ void host_integer_radix_scalar_maxmin_kb(
 
 template <typename Torus>
 __host__ void host_integer_radix_scalar_equality_check_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in, Torus const *scalar_blocks,
     int_comparison_buffer<Torus> *mem_ptr, void *const *bsks,

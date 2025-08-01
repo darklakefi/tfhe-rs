@@ -13,7 +13,7 @@
 
 template <typename Torus>
 __host__ uint64_t scratch_cuda_integer_radix_scalar_rotate_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_logical_scalar_shift_buffer<Torus> **mem_ptr,
     uint32_t num_radix_blocks, int_radix_params params,
     SHIFT_OR_ROTATE_TYPE shift_type, bool allocate_gpu_memory) {
@@ -27,7 +27,7 @@ __host__ uint64_t scratch_cuda_integer_radix_scalar_rotate_kb(
 
 template <typename Torus>
 __host__ void host_integer_radix_scalar_rotate_kb_inplace(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array, uint32_t n,
     int_logical_scalar_shift_buffer<Torus> *mem, void *const *bsks,
     Torus *const *ksks,

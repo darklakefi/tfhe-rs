@@ -6,7 +6,7 @@
 
 template <typename Torus>
 __host__ void host_integer_radix_scalar_bitop_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *output,
     CudaRadixCiphertextFFI const *input, Torus const *clear_blocks,
     Torus const *h_clear_blocks, uint32_t num_clear_blocks,

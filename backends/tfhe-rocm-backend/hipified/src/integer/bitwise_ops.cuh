@@ -13,7 +13,7 @@
 
 template <typename Torus>
 __host__ void host_integer_radix_bitop_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_1,
     CudaRadixCiphertextFFI const *lwe_array_2, int_bitop_buffer<Torus> *mem_ptr,
@@ -53,7 +53,7 @@ __host__ void host_integer_radix_bitop_kb(
 
 template <typename Torus>
 __host__ uint64_t scratch_cuda_integer_radix_bitop_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_bitop_buffer<Torus> **mem_ptr,
     uint32_t num_radix_blocks, int_radix_params params, BITOP_TYPE op,
     bool allocate_gpu_memory) {

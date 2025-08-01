@@ -148,7 +148,7 @@ __global__ void polynomial_accumulate_monic_monomial_mul_many_neg_and_add_C(
 
 template <typename Torus>
 __host__ void host_packing_keyswitch_lwe_list_to_glwe(
-    cudaStream_t stream, uint32_t gpu_index, Torus *glwe_out,
+    hipStream_t stream, uint32_t gpu_index, Torus *glwe_out,
     Torus const *lwe_array_in, Torus const *fp_ksk_array, int8_t *fp_ks_buffer,
     uint32_t lwe_dimension, uint32_t glwe_dimension, uint32_t polynomial_size,
     uint32_t base_log, uint32_t level_count, uint32_t num_lwes) {
@@ -156,7 +156,7 @@ __host__ void host_packing_keyswitch_lwe_list_to_glwe(
   // Optimization of packing keyswitch when packing many LWEs
 
   cuda_set_device(gpu_index);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   int glwe_accumulator_size = (glwe_dimension + 1) * polynomial_size;
 
@@ -180,7 +180,7 @@ __host__ void host_packing_keyswitch_lwe_list_to_glwe(
   // decomposition temporary results
   cuda_memset_async(d_mem_1, 0, num_lwes * memory_unit * sizeof(Torus), stream,
                     gpu_index);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   // decompose LWEs
   // don't decompose LWE body - the LWE has lwe_size + 1 elements. The last
@@ -193,7 +193,7 @@ __host__ void host_packing_keyswitch_lwe_list_to_glwe(
   // decompose first level
   decompose_vectorize_init<Torus><<<grid_decomp, threads_decomp, 0, stream>>>(
       lwe_array_in, d_mem_0, lwe_dimension, num_lwes, base_log, level_count);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   // gemm to ks the individual LWEs to GLWEs
   dim3 grid_gemm(CEIL_DIV(glwe_accumulator_size, BLOCK_SIZE_GEMM),
@@ -210,7 +210,7 @@ __host__ void host_packing_keyswitch_lwe_list_to_glwe(
   tgemm<Torus><<<grid_gemm, threads_gemm, shared_mem_size, stream>>>(
       num_lwes, glwe_accumulator_size, lwe_dimension, d_mem_0, fp_ksk_array,
       stride_KSK_buffer, d_mem_1, glwe_accumulator_size);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   auto ksk_block_size = glwe_accumulator_size;
 
@@ -218,13 +218,13 @@ __host__ void host_packing_keyswitch_lwe_list_to_glwe(
     decompose_vectorize_step_inplace<Torus>
         <<<grid_decomp, threads_decomp, 0, stream>>>(
             d_mem_0, lwe_dimension, num_lwes, base_log, level_count);
-    check_cuda_error(cudaGetLastError());
+    check_cuda_error(hipGetLastError());
 
     tgemm<Torus><<<grid_gemm, threads_gemm, shared_mem_size, stream>>>(
         num_lwes, glwe_accumulator_size, lwe_dimension, d_mem_0,
         fp_ksk_array + li * ksk_block_size, stride_KSK_buffer, d_mem_1,
         glwe_accumulator_size);
-    check_cuda_error(cudaGetLastError());
+    check_cuda_error(hipGetLastError());
   }
 
   // should we include the mask in the rotation ??
@@ -236,7 +236,7 @@ __host__ void host_packing_keyswitch_lwe_list_to_glwe(
       <<<grid_rotate, threads_rotate, 0, stream>>>(
           d_mem_1, d_mem_0, lwe_array_in, lwe_dimension, num_lwes,
           polynomial_size, glwe_dimension);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   dim3 grid_accumulate(
       CEIL_DIV(polynomial_size * (glwe_dimension + 1), BLOCK_SIZE_DECOMP));
@@ -246,7 +246,7 @@ __host__ void host_packing_keyswitch_lwe_list_to_glwe(
   accumulate_glwes<Torus><<<grid_accumulate, threads_accum, 0, stream>>>(
       glwe_out, d_mem_0, glwe_dimension, polynomial_size, num_lwes);
 
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 #endif

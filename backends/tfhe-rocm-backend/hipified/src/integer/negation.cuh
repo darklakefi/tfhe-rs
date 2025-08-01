@@ -55,7 +55,7 @@ device_integer_radix_negation(Torus *output, Torus const *input,
 
 template <typename Torus>
 __host__ void host_integer_radix_negation(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in, uint64_t message_modulus,
     uint64_t carry_modulus, uint32_t num_radix_blocks) {
@@ -114,7 +114,7 @@ __host__ void host_integer_radix_negation(
 
 template <typename Torus>
 __host__ uint64_t scratch_cuda_integer_overflowing_sub_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_overflowing_sub_memory<Torus> **mem_ptr,
     uint32_t num_blocks, int_radix_params params, bool allocate_gpu_memory,
     bool allocate_ms_array) {
@@ -130,7 +130,7 @@ __host__ uint64_t scratch_cuda_integer_overflowing_sub_kb(
 
 template <typename Torus>
 __host__ void host_integer_overflowing_sub(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *output,
     CudaRadixCiphertextFFI *input_left,
     const CudaRadixCiphertextFFI *input_right,
@@ -162,7 +162,7 @@ __host__ void host_integer_overflowing_sub(
   uint32_t grouping_size = num_bits_in_block;
   uint32_t num_groups = (num_blocks + grouping_size - 1) / grouping_size;
 
-  auto stream = (cudaStream_t *)streams;
+  auto stream = (hipStream_t *)streams;
   host_unchecked_sub_with_correcting_term<Torus>(
       stream[0], gpu_indexes[0], output, input_left, input_right, num_blocks,
       radix_params.message_modulus, radix_params.carry_modulus);

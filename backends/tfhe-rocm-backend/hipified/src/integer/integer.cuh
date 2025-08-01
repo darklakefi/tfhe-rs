@@ -98,7 +98,7 @@ __host__ void array_rotate_left(Torus *array_out, Torus *array_in,
 // one block is responsible to process single lwe ciphertext
 template <typename Torus>
 __host__ void host_radix_blocks_rotate_right(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *dst,
     CudaRadixCiphertextFFI *src, uint32_t rotations, uint32_t num_blocks) {
   if (src == dst) {
@@ -130,7 +130,7 @@ __host__ void host_radix_blocks_rotate_right(
 // calculation is not inplace, so `dst` and `src` must not be the same
 template <typename Torus>
 __host__ void host_radix_blocks_rotate_left(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *dst,
     CudaRadixCiphertextFFI *src, uint32_t value, uint32_t num_blocks) {
   if (src == dst) {
@@ -179,7 +179,7 @@ __global__ void radix_blocks_reverse_lwe_inplace(Torus *src,
 /// This function does not update noise level/degree at this stage,
 /// it can be added later
 template <typename Torus>
-__host__ void host_radix_blocks_reverse_inplace(cudaStream_t const *streams,
+__host__ void host_radix_blocks_reverse_inplace(hipStream_t const *streams,
                                                 uint32_t const *gpu_indexes,
                                                 CudaRadixCiphertextFFI *src) {
   cuda_set_device(gpu_indexes[0]);
@@ -223,7 +223,7 @@ __global__ void device_radix_cumulative_sum_in_groups(Torus *dest, Torus *src,
 /// This function does not update noise level/degree at this stage,
 /// it can be added later
 template <typename Torus>
-__host__ void host_radix_cumulative_sum_in_groups(cudaStream_t stream,
+__host__ void host_radix_cumulative_sum_in_groups(hipStream_t stream,
                                                   uint32_t gpu_index,
                                                   CudaRadixCiphertextFFI *dest,
                                                   CudaRadixCiphertextFFI *src,
@@ -295,7 +295,7 @@ __global__ void device_radix_split_simulators_and_grouping_pgns(
 /// it can be added later
 template <typename Torus>
 __host__ void host_radix_split_simulators_and_grouping_pgns(
-    cudaStream_t stream, uint32_t gpu_index, CudaRadixCiphertextFFI *simulators,
+    hipStream_t stream, uint32_t gpu_index, CudaRadixCiphertextFFI *simulators,
     CudaRadixCiphertextFFI *grouping_pgns, CudaRadixCiphertextFFI *src,
     uint32_t num_radix_blocks, uint32_t group_size, Torus delta) {
 
@@ -348,7 +348,7 @@ __global__ void device_radix_sum_in_groups(Torus *dest, Torus *src1,
 /// This function does not update noise level
 /// /degree at this stage, could be added later
 template <typename Torus>
-__host__ void host_radix_sum_in_groups(cudaStream_t stream, uint32_t gpu_index,
+__host__ void host_radix_sum_in_groups(hipStream_t stream, uint32_t gpu_index,
                                        CudaRadixCiphertextFFI *dest,
                                        CudaRadixCiphertextFFI *src1,
                                        CudaRadixCiphertextFFI *src2,
@@ -405,7 +405,7 @@ device_pack_bivariate_blocks(Torus *lwe_array_out, Torus const *lwe_indexes_out,
 /// it can be added later
 template <typename Torus>
 __host__ void host_pack_bivariate_blocks(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     Torus const *lwe_indexes_out, CudaRadixCiphertextFFI const *lwe_array_1,
     CudaRadixCiphertextFFI const *lwe_array_2, Torus const *lwe_indexes_in,

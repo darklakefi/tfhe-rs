@@ -107,7 +107,7 @@ __device__ const T *get_multi_bit_ith_lwe_gth_group_kth_block(
 
 ////////////////////////////////////////////////
 template <typename T, typename ST>
-void cuda_convert_lwe_programmable_bootstrap_key(cudaStream_t stream,
+void cuda_convert_lwe_programmable_bootstrap_key(hipStream_t stream,
                                                  uint32_t gpu_index,
                                                  double2 *dest, ST const *src,
                                                  uint32_t polynomial_size,
@@ -125,7 +125,7 @@ void cuda_convert_lwe_programmable_bootstrap_key(cudaStream_t stream,
   int blockSize = polynomial_size / choose_opt_amortized(polynomial_size);
 
   double2 *h_bsk;
-  cudaMallocHost((void **)&h_bsk, buffer_size);
+  hipHostMalloc((void **)&h_bsk, buffer_size);
 
   double2 *d_bsk = (double2 *)cuda_malloc_async(buffer_size, stream, gpu_index);
 
@@ -169,12 +169,12 @@ void cuda_convert_lwe_programmable_bootstrap_key(cudaStream_t stream,
     break;
   case 512:
     if (shared_memory_size <= max_shared_memory) {
-      check_cuda_error(cudaFuncSetAttribute(
+      check_cuda_error(hipFuncSetAttribute(
           batch_NSMFFT<FFTDegree<AmortizedDegree<512>, ForwardFFT>, FULLSM>,
-          cudaFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
-      check_cuda_error(cudaFuncSetCacheConfig(
+          hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
+      check_cuda_error(hipFuncSetCacheConfig(
           batch_NSMFFT<FFTDegree<AmortizedDegree<512>, ForwardFFT>, FULLSM>,
-          cudaFuncCachePreferShared));
+          hipFuncCachePreferShared));
       batch_NSMFFT<FFTDegree<AmortizedDegree<512>, ForwardFFT>, FULLSM>
           <<<gridSize, blockSize, shared_memory_size, stream>>>(d_bsk, dest,
                                                                 buffer);
@@ -187,12 +187,12 @@ void cuda_convert_lwe_programmable_bootstrap_key(cudaStream_t stream,
     break;
   case 1024:
     if (shared_memory_size <= max_shared_memory) {
-      check_cuda_error(cudaFuncSetAttribute(
+      check_cuda_error(hipFuncSetAttribute(
           batch_NSMFFT<FFTDegree<AmortizedDegree<1024>, ForwardFFT>, FULLSM>,
-          cudaFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
-      check_cuda_error(cudaFuncSetCacheConfig(
+          hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
+      check_cuda_error(hipFuncSetCacheConfig(
           batch_NSMFFT<FFTDegree<AmortizedDegree<1024>, ForwardFFT>, FULLSM>,
-          cudaFuncCachePreferShared));
+          hipFuncCachePreferShared));
       batch_NSMFFT<FFTDegree<AmortizedDegree<1024>, ForwardFFT>, FULLSM>
           <<<gridSize, blockSize, shared_memory_size, stream>>>(d_bsk, dest,
                                                                 buffer);
@@ -205,12 +205,12 @@ void cuda_convert_lwe_programmable_bootstrap_key(cudaStream_t stream,
     break;
   case 2048:
     if (shared_memory_size <= max_shared_memory) {
-      check_cuda_error(cudaFuncSetAttribute(
+      check_cuda_error(hipFuncSetAttribute(
           batch_NSMFFT<FFTDegree<AmortizedDegree<2048>, ForwardFFT>, FULLSM>,
-          cudaFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
-      check_cuda_error(cudaFuncSetCacheConfig(
+          hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
+      check_cuda_error(hipFuncSetCacheConfig(
           batch_NSMFFT<FFTDegree<AmortizedDegree<2048>, ForwardFFT>, FULLSM>,
-          cudaFuncCachePreferShared));
+          hipFuncCachePreferShared));
       batch_NSMFFT<FFTDegree<AmortizedDegree<2048>, ForwardFFT>, FULLSM>
           <<<gridSize, blockSize, shared_memory_size, stream>>>(d_bsk, dest,
                                                                 buffer);
@@ -223,12 +223,12 @@ void cuda_convert_lwe_programmable_bootstrap_key(cudaStream_t stream,
     break;
   case 4096:
     if (shared_memory_size <= max_shared_memory) {
-      check_cuda_error(cudaFuncSetAttribute(
+      check_cuda_error(hipFuncSetAttribute(
           batch_NSMFFT<FFTDegree<AmortizedDegree<4096>, ForwardFFT>, FULLSM>,
-          cudaFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
-      check_cuda_error(cudaFuncSetCacheConfig(
+          hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
+      check_cuda_error(hipFuncSetCacheConfig(
           batch_NSMFFT<FFTDegree<AmortizedDegree<4096>, ForwardFFT>, FULLSM>,
-          cudaFuncCachePreferShared));
+          hipFuncCachePreferShared));
       batch_NSMFFT<FFTDegree<AmortizedDegree<4096>, ForwardFFT>, FULLSM>
           <<<gridSize, blockSize, shared_memory_size, stream>>>(d_bsk, dest,
                                                                 buffer);
@@ -241,12 +241,12 @@ void cuda_convert_lwe_programmable_bootstrap_key(cudaStream_t stream,
     break;
   case 8192:
     if (shared_memory_size <= max_shared_memory) {
-      check_cuda_error(cudaFuncSetAttribute(
+      check_cuda_error(hipFuncSetAttribute(
           batch_NSMFFT<FFTDegree<AmortizedDegree<8192>, ForwardFFT>, FULLSM>,
-          cudaFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
-      check_cuda_error(cudaFuncSetCacheConfig(
+          hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
+      check_cuda_error(hipFuncSetCacheConfig(
           batch_NSMFFT<FFTDegree<AmortizedDegree<8192>, ForwardFFT>, FULLSM>,
-          cudaFuncCachePreferShared));
+          hipFuncCachePreferShared));
       batch_NSMFFT<FFTDegree<AmortizedDegree<8192>, ForwardFFT>, FULLSM>
           <<<gridSize, blockSize, shared_memory_size, stream>>>(d_bsk, dest,
                                                                 buffer);
@@ -259,12 +259,12 @@ void cuda_convert_lwe_programmable_bootstrap_key(cudaStream_t stream,
     break;
   case 16384:
     if (shared_memory_size <= max_shared_memory) {
-      check_cuda_error(cudaFuncSetAttribute(
+      check_cuda_error(hipFuncSetAttribute(
           batch_NSMFFT<FFTDegree<AmortizedDegree<16384>, ForwardFFT>, FULLSM>,
-          cudaFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
-      check_cuda_error(cudaFuncSetCacheConfig(
+          hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
+      check_cuda_error(hipFuncSetCacheConfig(
           batch_NSMFFT<FFTDegree<AmortizedDegree<16384>, ForwardFFT>, FULLSM>,
-          cudaFuncCachePreferShared));
+          hipFuncCachePreferShared));
       batch_NSMFFT<FFTDegree<AmortizedDegree<16384>, ForwardFFT>, FULLSM>
           <<<gridSize, blockSize, shared_memory_size, stream>>>(d_bsk, dest,
                                                                 buffer);
@@ -279,15 +279,15 @@ void cuda_convert_lwe_programmable_bootstrap_key(cudaStream_t stream,
     PANIC("Cuda error (convert KSK): unsupported polynomial size. Supported "
           "N's are powers of two in the interval [256..16384].")
   }
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   cuda_drop_async(d_bsk, stream, gpu_index);
   cuda_drop_async(buffer, stream, gpu_index);
-  cudaFreeHost(h_bsk);
+  hipHostFree(h_bsk);
 }
 
 template <class params>
-void convert_u128_to_f128_and_forward_fft_128(cudaStream_t stream,
+void convert_u128_to_f128_and_forward_fft_128(hipStream_t stream,
                                               uint32_t gpu_index, double *d_bsk,
                                               __uint128_t const *d_standard,
                                               uint32_t number_of_samples) {
@@ -305,18 +305,18 @@ void convert_u128_to_f128_and_forward_fft_128(cudaStream_t stream,
 
   // configure shared memory for batch fft kernel
   if (full_sm) {
-    check_cuda_error(cudaFuncSetAttribute(
+    check_cuda_error(hipFuncSetAttribute(
         batch_NSMFFT_strided_128<FFTDegree<params, ForwardFFT>, FULLSM>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
-    check_cuda_error(cudaFuncSetCacheConfig(
+        hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
+    check_cuda_error(hipFuncSetCacheConfig(
         batch_NSMFFT_strided_128<FFTDegree<params, ForwardFFT>, FULLSM>,
-        cudaFuncCachePreferShared));
+        hipFuncCachePreferShared));
   }
 
   // convert u128 into 4 x double
   batch_convert_u128_to_f128_strided_as_torus<params>
       <<<grid_size, block_size, 0, stream>>>(d_bsk, d_standard);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   // call negacyclic 128 bit forward fft.
   if (full_sm) {
@@ -328,7 +328,7 @@ void convert_u128_to_f128_and_forward_fft_128(cudaStream_t stream,
         <<<grid_size, block_size, shared_memory_size, stream>>>(d_bsk, d_bsk,
                                                                 buffer);
   }
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
   cuda_drop_async(buffer, stream, gpu_index);
 }
 

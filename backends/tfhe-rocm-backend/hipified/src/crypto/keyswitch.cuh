@@ -109,7 +109,7 @@ keyswitch(Torus *lwe_array_out, const Torus *__restrict__ lwe_output_indexes,
 
 template <typename Torus>
 __host__ void host_keyswitch_lwe_ciphertext_vector(
-    cudaStream_t stream, uint32_t gpu_index, Torus *lwe_array_out,
+    hipStream_t stream, uint32_t gpu_index, Torus *lwe_array_out,
     Torus const *lwe_output_indexes, Torus const *lwe_array_in,
     Torus const *lwe_input_indexes, Torus const *ksk, uint32_t lwe_dimension_in,
     uint32_t lwe_dimension_out, uint32_t base_log, uint32_t level_count,
@@ -140,7 +140,7 @@ __host__ void host_keyswitch_lwe_ciphertext_vector(
 }
 
 template <typename Torus>
-void execute_keyswitch_async(cudaStream_t const *streams,
+void execute_keyswitch_async(hipStream_t const *streams,
                              uint32_t const *gpu_indexes, uint32_t gpu_count,
                              const LweArrayVariant<Torus> &lwe_array_out,
                              const LweArrayVariant<Torus> &lwe_output_indexes,
@@ -173,7 +173,7 @@ void execute_keyswitch_async(cudaStream_t const *streams,
 
 template <typename Torus>
 __host__ uint64_t scratch_packing_keyswitch_lwe_list_to_glwe(
-    cudaStream_t stream, uint32_t gpu_index, int8_t **fp_ks_buffer,
+    hipStream_t stream, uint32_t gpu_index, int8_t **fp_ks_buffer,
     uint32_t lwe_dimension, uint32_t glwe_dimension, uint32_t polynomial_size,
     uint32_t num_lwes, bool allocate_gpu_memory) {
   cuda_set_device(gpu_index);

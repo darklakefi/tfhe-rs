@@ -3,7 +3,7 @@
 
 #ifdef __CDT_PARSER__
 #undef __CUDA_RUNTIME_H__
-#include <cuda_runtime.h>
+#include <hip/hip_runtime.h>
 #endif
 
 #include "device.h"
@@ -14,7 +14,7 @@
 
 template <typename Torus>
 uint64_t scratch_cuda_sub_and_propagate_single_carry(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_sub_and_propagate<Torus> **mem_ptr,
     uint32_t num_radix_blocks, int_radix_params params, uint32_t requested_flag,
     bool allocate_gpu_memory) {
@@ -30,7 +30,7 @@ uint64_t scratch_cuda_sub_and_propagate_single_carry(
 
 template <typename Torus>
 void host_sub_and_propagate_single_carry(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lhs_array,
     const CudaRadixCiphertextFFI *rhs_array, CudaRadixCiphertextFFI *carry_out,
     const CudaRadixCiphertextFFI *input_carries,
@@ -51,7 +51,7 @@ void host_sub_and_propagate_single_carry(
 
 template <typename Torus>
 __host__ void host_integer_radix_subtraction(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_array_in_1,
     CudaRadixCiphertextFFI const *lwe_array_in_2, uint64_t message_modulus,

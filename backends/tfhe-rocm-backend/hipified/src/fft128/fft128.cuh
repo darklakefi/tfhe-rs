@@ -471,7 +471,7 @@ __global__ void batch_NSMFFT_strided_128(double *d_in, double *d_out,
 
 template <class params>
 __host__ void host_fourier_transform_forward_as_integer_f128(
-    cudaStream_t stream, uint32_t gpu_index, double *re0, double *re1,
+    hipStream_t stream, uint32_t gpu_index, double *re0, double *re1,
     double *im0, double *im1, const __uint128_t *standard, const uint32_t N,
     const uint32_t number_of_samples) {
 
@@ -503,19 +503,19 @@ __host__ void host_fourier_transform_forward_as_integer_f128(
 
   // configure shared memory for batch fft kernel
   if (full_sm) {
-    check_cuda_error(cudaFuncSetAttribute(
+    check_cuda_error(hipFuncSetAttribute(
         batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
-    check_cuda_error(cudaFuncSetCacheConfig(
+        hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
+    check_cuda_error(hipFuncSetCacheConfig(
         batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
-        cudaFuncCachePreferShared));
+        hipFuncCachePreferShared));
   }
 
   // convert u128 into 4 x double
   batch_convert_u128_to_f128_as_integer<params>
       <<<grid_size, block_size, 0, stream>>>(d_re0, d_re1, d_im0, d_im1,
                                              d_standard);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   // call negacyclic 128 bit forward fft.
   if (full_sm) {
@@ -527,7 +527,7 @@ __host__ void host_fourier_transform_forward_as_integer_f128(
         <<<grid_size, block_size, shared_memory_size, stream>>>(
             d_re0, d_re1, d_im0, d_im1, d_re0, d_re1, d_im0, d_im1, buffer);
   }
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   cuda_memcpy_async_to_cpu(re0, d_re0, N / 2 * sizeof(double), stream,
                            gpu_index);
@@ -547,7 +547,7 @@ __host__ void host_fourier_transform_forward_as_integer_f128(
 
 template <class params>
 __host__ void host_fourier_transform_forward_as_torus_f128(
-    cudaStream_t stream, uint32_t gpu_index, double *re0, double *re1,
+    hipStream_t stream, uint32_t gpu_index, double *re0, double *re1,
     double *im0, double *im1, const __uint128_t *standard, const uint32_t N,
     const uint32_t number_of_samples) {
 
@@ -579,12 +579,12 @@ __host__ void host_fourier_transform_forward_as_torus_f128(
 
   // configure shared memory for batch fft kernel
   if (full_sm) {
-    check_cuda_error(cudaFuncSetAttribute(
+    check_cuda_error(hipFuncSetAttribute(
         batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
-    check_cuda_error(cudaFuncSetCacheConfig(
+        hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
+    check_cuda_error(hipFuncSetCacheConfig(
         batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
-        cudaFuncCachePreferShared));
+        hipFuncCachePreferShared));
   }
 
   // convert u128 into 4 x double
@@ -621,7 +621,7 @@ __host__ void host_fourier_transform_forward_as_torus_f128(
 
 template <class params>
 __host__ void host_fourier_transform_backward_as_torus_f128(
-    cudaStream_t stream, uint32_t gpu_index, __uint128_t *standard,
+    hipStream_t stream, uint32_t gpu_index, __uint128_t *standard,
     double const *re0, double const *re1, double const *im0, double const *im1,
     const uint32_t N, const uint32_t number_of_samples) {
 
@@ -659,12 +659,12 @@ __host__ void host_fourier_transform_backward_as_torus_f128(
 
   // configure shared memory for batch fft kernel
   if (full_sm) {
-    check_cuda_error(cudaFuncSetAttribute(
+    check_cuda_error(hipFuncSetAttribute(
         batch_NSMFFT_128<FFTDegree<params, BackwardFFT>, FULLSM>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
-    check_cuda_error(cudaFuncSetCacheConfig(
+        hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
+    check_cuda_error(hipFuncSetCacheConfig(
         batch_NSMFFT_128<FFTDegree<params, BackwardFFT>, FULLSM>,
-        cudaFuncCachePreferShared));
+        hipFuncCachePreferShared));
     batch_NSMFFT_128<FFTDegree<params, BackwardFFT>, FULLSM>
         <<<grid_size, block_size, shared_memory_size, stream>>>(
             d_re0, d_re1, d_im0, d_im1, d_re0, d_re1, d_im0, d_im1, buffer);

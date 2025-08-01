@@ -25,7 +25,7 @@ __global__ void device_integer_radix_scalar_addition_inplace(
 
 template <typename Torus>
 __host__ void host_integer_radix_scalar_addition_inplace(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array,
     Torus const *scalar_input, Torus const *h_scalar_input,
     uint32_t num_scalars, uint32_t message_modulus, uint32_t carry_modulus) {
@@ -70,7 +70,7 @@ __global__ void device_integer_radix_add_scalar_one_inplace(
 
 template <typename Torus>
 __host__ void host_integer_radix_add_scalar_one_inplace(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array,
     uint32_t message_modulus, uint32_t carry_modulus) {
   cuda_set_device(gpu_indexes[0]);
@@ -113,7 +113,7 @@ __global__ void device_integer_radix_scalar_subtraction_inplace(
 
 template <typename Torus>
 __host__ void host_integer_radix_scalar_subtraction_inplace(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, Torus *lwe_array, Torus *scalar_input,
     uint32_t lwe_dimension, uint32_t input_lwe_ciphertext_count,
     uint32_t message_modulus, uint32_t carry_modulus) {

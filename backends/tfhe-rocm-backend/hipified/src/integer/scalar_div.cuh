@@ -9,7 +9,7 @@
 
 template <typename Torus>
 __host__ uint64_t scratch_integer_unsigned_scalar_div_radix(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, const int_radix_params params,
     int_unsigned_scalar_div_mem<Torus> **mem_ptr, uint32_t num_radix_blocks,
     const CudaScalarDivisorFFI *scalar_divisor_ffi,
@@ -26,7 +26,7 @@ __host__ uint64_t scratch_integer_unsigned_scalar_div_radix(
 
 template <typename Torus>
 __host__ void host_integer_unsigned_scalar_div_radix(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *numerator_ct,
     int_unsigned_scalar_div_mem<Torus> *mem_ptr, void *const *bsks,
     Torus *const *ksks,
@@ -113,7 +113,7 @@ __host__ void host_integer_unsigned_scalar_div_radix(
 
 template <typename Torus>
 __host__ uint64_t scratch_integer_signed_scalar_div_radix_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_radix_params params,
     int_signed_scalar_div_mem<Torus> **mem_ptr, uint32_t num_radix_blocks,
     const CudaScalarDivisorFFI *scalar_divisor_ffi,
@@ -130,7 +130,7 @@ __host__ uint64_t scratch_integer_signed_scalar_div_radix_kb(
 
 template <typename Torus>
 __host__ void host_integer_signed_scalar_div_radix_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *numerator_ct,
     int_signed_scalar_div_mem<Torus> *mem_ptr, void *const *bsks,
     Torus *const *ksks,
@@ -262,7 +262,7 @@ __host__ void host_integer_signed_scalar_div_radix_kb(
 
 template <typename Torus>
 __host__ uint64_t scratch_integer_unsigned_scalar_div_rem_radix(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, const int_radix_params params,
     int_unsigned_scalar_div_rem_buffer<Torus> **mem_ptr,
     uint32_t num_radix_blocks, const CudaScalarDivisorFFI *scalar_divisor_ffi,
@@ -278,7 +278,7 @@ __host__ uint64_t scratch_integer_unsigned_scalar_div_rem_radix(
 
 template <typename Torus>
 __host__ void host_integer_unsigned_scalar_div_rem_radix(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *quotient_ct,
     CudaRadixCiphertextFFI *remainder_ct,
     int_unsigned_scalar_div_rem_buffer<Torus> *mem_ptr, void *const *bsks,
@@ -335,7 +335,7 @@ __host__ void host_integer_unsigned_scalar_div_rem_radix(
 
 template <typename Torus>
 __host__ uint64_t scratch_integer_signed_scalar_div_rem_radix(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, const int_radix_params params,
     int_signed_scalar_div_rem_buffer<Torus> **mem_ptr,
     uint32_t num_radix_blocks, const CudaScalarDivisorFFI *scalar_divisor_ffi,
@@ -353,7 +353,7 @@ __host__ uint64_t scratch_integer_signed_scalar_div_rem_radix(
 
 template <typename Torus>
 __host__ void host_integer_signed_scalar_div_rem_radix(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *quotient_ct,
     CudaRadixCiphertextFFI *remainder_ct,
     int_signed_scalar_div_rem_buffer<Torus> *mem_ptr, void *const *bsks,

@@ -3,7 +3,7 @@
 
 #ifdef __CDT_PARSER__
 #undef __CUDA_RUNTIME_H__
-#include <cuda_runtime.h>
+#include <hip/hip_runtime.h>
 #endif
 
 #include "cast.cuh"
@@ -30,7 +30,7 @@ __global__ void device_small_scalar_radix_multiplication(T *output_lwe_array,
 
 template <typename T>
 __host__ uint64_t scratch_cuda_integer_radix_scalar_mul_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_scalar_mul_buffer<T> **mem_ptr,
     uint32_t num_radix_blocks, int_radix_params params,
     uint32_t num_scalar_bits, bool allocate_gpu_memory) {
@@ -44,7 +44,7 @@ __host__ uint64_t scratch_cuda_integer_radix_scalar_mul_kb(
 
 template <typename T>
 __host__ void host_integer_scalar_mul_radix(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array,
     T const *decomposed_scalar, T const *has_at_least_one_set,
     int_scalar_mul_buffer<T> *mem, void *const *bsks, T *const *ksks,
@@ -134,7 +134,7 @@ __host__ void host_integer_scalar_mul_radix(
 // Small scalar_mul is used in shift/rotate
 template <typename T>
 __host__ void host_integer_small_scalar_mul_radix(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *output_lwe_array,
     CudaRadixCiphertextFFI *input_lwe_array, T scalar,
     const uint32_t message_modulus, const uint32_t carry_modulus) {
@@ -174,7 +174,7 @@ __host__ void host_integer_small_scalar_mul_radix(
 
 template <typename Torus>
 __host__ void host_integer_radix_scalar_mul_high_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *ct,
     int_scalar_mul_high_buffer<Torus> *mem_ptr, Torus *const *ksks,
     CudaModulusSwitchNoiseReductionKeyFFI const *ms_noise_reduction_key,
@@ -219,7 +219,7 @@ __host__ void host_integer_radix_scalar_mul_high_kb(
 
 template <typename Torus>
 __host__ void host_integer_radix_signed_scalar_mul_high_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *ct,
     int_signed_scalar_mul_high_buffer<Torus> *mem_ptr, Torus *const *ksks,
     const CudaScalarDivisorFFI *scalar_divisor_ffi,

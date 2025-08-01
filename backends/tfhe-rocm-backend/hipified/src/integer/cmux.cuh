@@ -6,7 +6,7 @@
 
 template <typename Torus>
 __host__ void
-zero_out_if(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+zero_out_if(hipStream_t const *streams, uint32_t const *gpu_indexes,
             uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
             CudaRadixCiphertextFFI const *lwe_array_input,
             CudaRadixCiphertextFFI const *lwe_condition,
@@ -41,7 +41,7 @@ zero_out_if(cudaStream_t const *streams, uint32_t const *gpu_indexes,
 
 template <typename Torus>
 __host__ void host_integer_radix_cmux_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *lwe_array_out,
     CudaRadixCiphertextFFI const *lwe_condition,
     CudaRadixCiphertextFFI const *lwe_array_true,
@@ -94,7 +94,7 @@ __host__ void host_integer_radix_cmux_kb(
 
 template <typename Torus>
 __host__ uint64_t scratch_cuda_integer_radix_cmux_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_cmux_buffer<Torus> **mem_ptr,
     std::function<Torus(Torus)> predicate_lut_f, uint32_t num_radix_blocks,
     int_radix_params params, bool allocate_gpu_memory) {

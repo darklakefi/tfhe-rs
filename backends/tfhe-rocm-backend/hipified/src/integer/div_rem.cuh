@@ -21,7 +21,7 @@
 
 template <typename Torus>
 __host__ uint64_t scratch_cuda_integer_div_rem_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, bool is_signed, int_div_rem_memory<Torus> **mem_ptr,
     uint32_t num_blocks, int_radix_params params, bool allocate_gpu_memory) {
 
@@ -34,7 +34,7 @@ __host__ uint64_t scratch_cuda_integer_div_rem_kb(
 
 template <typename Torus>
 __host__ void host_unsigned_integer_div_rem_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *quotient,
     CudaRadixCiphertextFFI *remainder, CudaRadixCiphertextFFI const *numerator,
     CudaRadixCiphertextFFI const *divisor, void *const *bsks,
@@ -116,7 +116,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
     // msb_bit_set) the split versions share some bits they should not. So we do
     // one PBS on the last block of the interesting_divisor, and first block of
     // divisor_ms_blocks to trim out bits which should not be there
-    auto trim_last_interesting_divisor_bits = [&](cudaStream_t const *streams,
+    auto trim_last_interesting_divisor_bits = [&](hipStream_t const *streams,
                                                   uint32_t const *gpu_indexes,
                                                   uint32_t gpu_count) {
       if ((msb_bit_set + 1) % num_bits_in_message == 0) {
@@ -154,7 +154,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
           mem_ptr->masking_luts_1[shifted_mask], 1);
     }; // trim_last_interesting_divisor_bits
 
-    auto trim_first_divisor_ms_bits = [&](cudaStream_t const *streams,
+    auto trim_first_divisor_ms_bits = [&](hipStream_t const *streams,
                                           uint32_t const *gpu_indexes,
                                           uint32_t gpu_count) {
       if (divisor_ms_blocks->num_radix_blocks == 0 ||
@@ -192,7 +192,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
     // However, to keep the remainder clean (noise wise), what we do is that we
     // put the remainder block from which we need to extract the bit, as the LSB
     // of the Remainder, so that left shifting will pull the bit we need.
-    auto left_shift_interesting_remainder1 = [&](cudaStream_t const *streams,
+    auto left_shift_interesting_remainder1 = [&](hipStream_t const *streams,
                                                  uint32_t const *gpu_indexes,
                                                  uint32_t gpu_count) {
       pop_radix_ciphertext_block_async<Torus>(streams[0], gpu_indexes[0],
@@ -231,7 +231,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
       }
     }; // left_shift_interesting_remainder1
 
-    auto left_shift_interesting_remainder2 = [&](cudaStream_t const *streams,
+    auto left_shift_interesting_remainder2 = [&](hipStream_t const *streams,
                                                  uint32_t const *gpu_indexes,
                                                  uint32_t gpu_count) {
       host_integer_radix_logical_scalar_shift_kb_inplace<Torus>(
@@ -296,7 +296,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
     // fills:
     //  `new_remainder` - radix ciphertext
     //  `subtraction_overflowed` - single ciphertext
-    auto do_overflowing_sub = [&](cudaStream_t const *streams,
+    auto do_overflowing_sub = [&](hipStream_t const *streams,
                                   uint32_t const *gpu_indexes,
                                   uint32_t gpu_count) {
       uint32_t compute_borrow = 1;
@@ -323,7 +323,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
 
     // fills:
     //  `at_least_one_upper_block_is_non_zero` - single ciphertext
-    auto check_divisor_upper_blocks = [&](cudaStream_t const *streams,
+    auto check_divisor_upper_blocks = [&](hipStream_t const *streams,
                                           uint32_t const *gpu_indexes,
                                           uint32_t gpu_count) {
       auto trivial_blocks = divisor_ms_blocks;
@@ -355,7 +355,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
     // fills:
     //  `cleaned_merged_interesting_remainder` - radix ciphertext
     auto create_clean_version_of_merged_remainder =
-        [&](cudaStream_t const *streams, uint32_t const *gpu_indexes,
+        [&](hipStream_t const *streams, uint32_t const *gpu_indexes,
             uint32_t gpu_count) {
           integer_radix_apply_univariate_lookup_table_kb<Torus>(
               streams, gpu_indexes, gpu_count,
@@ -399,7 +399,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
     }
 
     auto conditionally_zero_out_merged_interesting_remainder =
-        [&](cudaStream_t const *streams, uint32_t const *gpu_indexes,
+        [&](hipStream_t const *streams, uint32_t const *gpu_indexes,
             uint32_t gpu_count) {
           integer_radix_apply_bivariate_lookup_table_kb<Torus>(
               streams, gpu_indexes, gpu_count,
@@ -411,7 +411,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
         };
 
     auto conditionally_zero_out_merged_new_remainder =
-        [&](cudaStream_t const *streams, uint32_t const *gpu_indexes,
+        [&](hipStream_t const *streams, uint32_t const *gpu_indexes,
             uint32_t gpu_count) {
           integer_radix_apply_bivariate_lookup_table_kb<Torus>(
               streams, gpu_indexes, gpu_count, new_remainder, new_remainder,
@@ -420,7 +420,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
               new_remainder->num_radix_blocks, factor);
         };
 
-    auto set_quotient_bit = [&](cudaStream_t const *streams,
+    auto set_quotient_bit = [&](hipStream_t const *streams,
                                 uint32_t const *gpu_indexes,
                                 uint32_t gpu_count) {
       uint32_t block_of_bit = i / num_bits_in_message;
@@ -503,7 +503,7 @@ __host__ void host_unsigned_integer_div_rem_kb(
 
 template <typename Torus>
 __host__ void host_integer_div_rem_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *quotient,
     CudaRadixCiphertextFFI *remainder, CudaRadixCiphertextFFI const *numerator,
     CudaRadixCiphertextFFI const *divisor, bool is_signed, void *const *bsks,

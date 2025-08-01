@@ -18,7 +18,7 @@
 
 template <typename Torus>
 __host__ uint64_t scratch_cuda_integer_abs_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_abs_buffer<Torus> **mem_ptr, bool is_signed,
     uint32_t num_blocks, int_radix_params params, bool allocate_gpu_memory) {
 
@@ -33,7 +33,7 @@ __host__ uint64_t scratch_cuda_integer_abs_kb(
 
 template <typename Torus>
 __host__ void host_integer_abs_kb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *ct, void *const *bsks,
     uint64_t *const *ksks,
     CudaModulusSwitchNoiseReductionKeyFFI const *ms_noise_reduction_key,

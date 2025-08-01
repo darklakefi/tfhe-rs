@@ -3,7 +3,7 @@
 
 #ifdef __CDT_PARSER__
 #undef __CUDA_RUNTIME_H__
-#include <cuda_runtime.h>
+#include <hip/hip_runtime.h>
 #endif
 
 #include "bootstrapping_key.cuh"

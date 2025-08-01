@@ -8,7 +8,7 @@
 template <typename Torus>
 __host__ void host_extend_radix_with_trivial_zero_blocks_msb(
     CudaRadixCiphertextFFI *output, CudaRadixCiphertextFFI const *input,
-    cudaStream_t const *streams, uint32_t const *gpu_indexes) {
+    hipStream_t const *streams, uint32_t const *gpu_indexes) {
   copy_radix_ciphertext_slice_async<Torus>(streams[0], gpu_indexes[0], output,
                                            0, input->num_radix_blocks, input, 0,
                                            input->num_radix_blocks);
@@ -17,7 +17,7 @@ __host__ void host_extend_radix_with_trivial_zero_blocks_msb(
 template <typename Torus>
 __host__ void host_trim_radix_blocks_lsb(CudaRadixCiphertextFFI *output,
                                          CudaRadixCiphertextFFI const *input,
-                                         cudaStream_t const *streams,
+                                         hipStream_t const *streams,
                                          uint32_t const *gpu_indexes) {
 
   const uint32_t input_start_lwe_index =
@@ -35,7 +35,7 @@ __host__ void host_trim_radix_blocks_lsb(CudaRadixCiphertextFFI *output,
 
 template <typename Torus>
 __host__ uint64_t scratch_extend_radix_with_sign_msb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, int_extend_radix_with_sign_msb_buffer<Torus> **mem_ptr,
     const int_radix_params params, uint32_t num_radix_blocks,
     uint32_t num_additional_blocks, const bool allocate_gpu_memory) {
@@ -51,7 +51,7 @@ __host__ uint64_t scratch_extend_radix_with_sign_msb(
 
 template <typename Torus>
 __host__ void host_extend_radix_with_sign_msb(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, CudaRadixCiphertextFFI *output,
     CudaRadixCiphertextFFI const *input,
     int_extend_radix_with_sign_msb_buffer<Torus> *mem_ptr,
