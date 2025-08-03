@@ -31,7 +31,6 @@ __device__ double *get_join_buffer_element_128(
 // ROCm equivalent of CUDA_ARCH >= 900 check
 // For ROCm, we check for architectures that support advanced cooperative groups
 // This includes gfx90a and newer architectures
-#if defined(__gfx90a__) || defined(__gfx940__) || defined(__gfx941__) || defined(__gfx942__) || (ROCM_ARCH >= 90)
 template <>
 __device__ int get_this_block_rank(cluster_group &cluster, bool support_dsm) {
   if (support_dsm)
@@ -74,4 +73,3 @@ __device__ double *get_join_buffer_element_128(
   }
   return buffer_slice;
 }
-#endif
