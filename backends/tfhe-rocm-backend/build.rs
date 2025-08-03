@@ -56,16 +56,17 @@ fn main() {
         println!("cargo:rustc-link-search=native={}", dest.display());
         println!("cargo:rustc-link-lib=static=tfhe_rocm_backend");
 
-        // Try to find the cuda libs with pkg-config, default to the path used by the nvidia runfile
+        // Try to find the ROCm libs with pkg-config, default to the standard ROCm installation path
         if pkg_config::Config::new()
-            .atleast_version("10")
-            .probe("cuda")
+            .atleast_version("5.0")
+            .probe("hip")
             .is_err()
         {
-            println!("cargo:rustc-link-search=native=/usr/local/cuda/lib64");
+            println!("cargo:rustc-link-search=native=/opt/rocm/lib");
+            println!("cargo:rustc-link-search=native=/opt/rocm/lib64");
         }
         println!("cargo:rustc-link-lib=gomp");
-        println!("cargo:rustc-link-lib=cudart");
+        println!("cargo:rustc-link-lib=amdhip64");
         println!("cargo:rustc-link-search=native=/usr/lib/x86_64-linux-gnu/");
         println!("cargo:rustc-link-lib=stdc++");
 
