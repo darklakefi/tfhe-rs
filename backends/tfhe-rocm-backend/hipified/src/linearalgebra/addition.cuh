@@ -46,7 +46,7 @@ __global__ void plaintext_addition_scalar(T *output, T const *lwe_input,
 }
 
 template <typename T>
-__host__ void host_addition_plaintext(cudaStream_t stream, uint32_t gpu_index,
+__host__ void host_addition_plaintext(hipStream_t stream, uint32_t gpu_index,
                                       T *output, T const *lwe_input,
                                       T const *plaintext_input,
                                       const uint32_t lwe_dimension,
@@ -64,12 +64,12 @@ __host__ void host_addition_plaintext(cudaStream_t stream, uint32_t gpu_index,
       stream, gpu_index);
   plaintext_addition<T><<<grid, thds, 0, stream>>>(
       output, lwe_input, plaintext_input, lwe_dimension, num_entries);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename T>
 __host__ void host_addition_plaintext_scalar(
-    cudaStream_t stream, uint32_t gpu_index, T *output, T const *lwe_input,
+    hipStream_t stream, uint32_t gpu_index, T *output, T const *lwe_input,
     const T plaintext_input, const uint32_t lwe_dimension,
     const uint32_t lwe_ciphertext_count) {
 
@@ -85,7 +85,7 @@ __host__ void host_addition_plaintext_scalar(
       stream, gpu_index);
   plaintext_addition_scalar<T><<<grid, thds, 0, stream>>>(
       output, lwe_input, plaintext_input, lwe_dimension, num_entries);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename T>
@@ -104,7 +104,7 @@ __global__ void addition(T *output, T const *input_1, T const *input_2,
 // num_radix_blocks selects the amount of blocks to be added from the inputs
 template <typename T>
 __host__ void
-host_addition(cudaStream_t stream, uint32_t gpu_index,
+host_addition(hipStream_t stream, uint32_t gpu_index,
               CudaRadixCiphertextFFI *output,
               CudaRadixCiphertextFFI const *input_1,
               CudaRadixCiphertextFFI const *input_2, uint32_t num_radix_blocks,
@@ -132,7 +132,7 @@ host_addition(cudaStream_t stream, uint32_t gpu_index,
   addition<T><<<grid, thds, 0, stream>>>(
       static_cast<T *>(output->ptr), static_cast<const T *>(input_1->ptr),
       static_cast<const T *>(input_2->ptr), num_entries);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
   for (uint i = 0; i < num_radix_blocks; i++) {
     output->degrees[i] = input_1->degrees[i] + input_2->degrees[i];
     output->noise_levels[i] =
@@ -161,7 +161,7 @@ __global__ void constant_addition(T *output, T const *input_1, T const *input_2,
 // in input_with_multiple_blocks. The result is written to output
 template <typename T>
 __host__ void host_add_the_same_block_to_all_blocks(
-    cudaStream_t stream, uint32_t gpu_index, CudaRadixCiphertextFFI *output,
+    hipStream_t stream, uint32_t gpu_index, CudaRadixCiphertextFFI *output,
     CudaRadixCiphertextFFI const *input_with_multiple_blocks,
     CudaRadixCiphertextFFI const *input_with_single_block,
     const uint32_t message_modulus, const uint32_t carry_modulus) {
@@ -190,7 +190,7 @@ __host__ void host_add_the_same_block_to_all_blocks(
       static_cast<const T *>(input_with_multiple_blocks->ptr),
       static_cast<const T *>(input_with_single_block->ptr), lwe_size,
       num_entries);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
   for (uint i = 0; i < output->num_radix_blocks; i++) {
     output->degrees[i] = input_with_multiple_blocks->degrees[i] +
                          input_with_single_block->degrees[0];
@@ -214,7 +214,7 @@ __global__ void pack_for_overflowing_ops(T *output, T const *input_1,
 }
 
 template <typename T>
-__host__ void host_pack_for_overflowing_ops(cudaStream_t stream,
+__host__ void host_pack_for_overflowing_ops(hipStream_t stream,
                                             uint32_t gpu_index, T *output,
                                             T const *input_1, T const *input_2,
                                             uint32_t input_lwe_dimension,
@@ -237,7 +237,7 @@ __host__ void host_pack_for_overflowing_ops(cudaStream_t stream,
       &input_1[(input_lwe_ciphertext_count - 1) * lwe_size],
       &input_2[(input_lwe_ciphertext_count - 1) * lwe_size], lwe_size,
       message_modulus);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename T>
@@ -254,7 +254,7 @@ __global__ void subtraction(T *output, T const *input_1, T const *input_2,
 
 // Coefficient-wise subtraction
 template <typename T>
-__host__ void host_subtraction(cudaStream_t stream, uint32_t gpu_index,
+__host__ void host_subtraction(hipStream_t stream, uint32_t gpu_index,
                                T *output, T const *input_1, T const *input_2,
                                uint32_t input_lwe_dimension,
                                uint32_t input_lwe_ciphertext_count) {
@@ -272,7 +272,7 @@ __host__ void host_subtraction(cudaStream_t stream, uint32_t gpu_index,
 
   subtraction<T>
       <<<grid, thds, 0, stream>>>(output, input_1, input_2, num_entries);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename T>
@@ -291,7 +291,7 @@ __global__ void radix_body_subtraction_inplace(T *lwe_ct, T *plaintext_input,
 }
 
 template <typename T>
-__host__ void host_subtraction_plaintext(cudaStream_t stream,
+__host__ void host_subtraction_plaintext(hipStream_t stream,
                                          uint32_t gpu_index, T *output,
                                          T *lwe_input, T *plaintext_input,
                                          uint32_t input_lwe_dimension,
@@ -311,7 +311,7 @@ __host__ void host_subtraction_plaintext(cudaStream_t stream,
 
   radix_body_subtraction_inplace<T><<<grid, thds, 0, stream>>>(
       output, plaintext_input, input_lwe_dimension, num_entries);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename T>
@@ -339,7 +339,7 @@ unchecked_sub_with_correcting_term(T *output, T const *input_1,
 
 template <typename T>
 __host__ void host_unchecked_sub_with_correcting_term(
-    cudaStream_t stream, uint32_t gpu_index, CudaRadixCiphertextFFI *output,
+    hipStream_t stream, uint32_t gpu_index, CudaRadixCiphertextFFI *output,
     CudaRadixCiphertextFFI const *input_1,
     CudaRadixCiphertextFFI const *input_2, uint32_t num_radix_blocks,
     uint32_t message_modulus, uint32_t carry_modulus) {
@@ -369,7 +369,7 @@ __host__ void host_unchecked_sub_with_correcting_term(
   unchecked_sub_with_correcting_term<T><<<grid, thds, 0, stream>>>(
       (T *)output->ptr, (T *)input_1->ptr, (T *)input_2->ptr, num_entries,
       lwe_size, message_modulus, carry_modulus, message_modulus - 1);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
   uint8_t zb = 0;
   for (uint i = 0; i < num_radix_blocks; i++) {
     auto input_2_degree = input_2->degrees[i];

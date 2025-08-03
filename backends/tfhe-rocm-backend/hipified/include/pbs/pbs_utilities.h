@@ -3,7 +3,7 @@
 
 #include "device.h"
 #include "pbs_enums.h"
-#include "vector_types.h"
+#include "hip/hip_vector_types.h"
 #include <stdint.h>
 
 template <typename Torus>
@@ -86,7 +86,7 @@ template <typename Torus> struct pbs_buffer<Torus, PBS_TYPE::CLASSICAL> {
   bool uses_noise_reduction;
   bool gpu_memory_allocated;
 
-  pbs_buffer(cudaStream_t stream, uint32_t gpu_index, uint32_t lwe_dimension,
+  pbs_buffer(hipStream_t stream, uint32_t gpu_index, uint32_t lwe_dimension,
              uint32_t glwe_dimension, uint32_t polynomial_size,
              uint32_t level_count, uint32_t input_lwe_ciphertext_count,
              PBS_VARIANT pbs_variant, bool allocate_gpu_memory,
@@ -224,7 +224,7 @@ template <typename Torus> struct pbs_buffer<Torus, PBS_TYPE::CLASSICAL> {
     }
   }
 
-  void release(cudaStream_t stream, uint32_t gpu_index) {
+  void release(hipStream_t stream, uint32_t gpu_index) {
     cuda_drop_with_size_tracking_async(d_mem, stream, gpu_index,
                                        gpu_memory_allocated);
     cuda_drop_with_size_tracking_async(global_join_buffer, stream, gpu_index,
@@ -255,7 +255,7 @@ struct pbs_buffer_128<InputTorus, PBS_TYPE::CLASSICAL> {
   bool uses_noise_reduction;
   bool gpu_memory_allocated;
 
-  pbs_buffer_128(cudaStream_t stream, uint32_t gpu_index,
+  pbs_buffer_128(hipStream_t stream, uint32_t gpu_index,
                  uint32_t lwe_dimension, uint32_t glwe_dimension,
                  uint32_t polynomial_size, uint32_t level_count,
                  uint32_t input_lwe_ciphertext_count, PBS_VARIANT pbs_variant,
@@ -410,7 +410,7 @@ struct pbs_buffer_128<InputTorus, PBS_TYPE::CLASSICAL> {
     }
   }
 
-  void release(cudaStream_t stream, uint32_t gpu_index) {
+  void release(hipStream_t stream, uint32_t gpu_index) {
     cuda_drop_with_size_tracking_async(d_mem, stream, gpu_index,
                                        gpu_memory_allocated);
     cuda_drop_with_size_tracking_async(global_join_buffer, stream, gpu_index,

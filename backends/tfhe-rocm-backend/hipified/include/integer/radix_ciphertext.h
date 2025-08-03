@@ -1,7 +1,7 @@
 #ifndef CUDA_RADIX_CIPHERTEXT_H
 #define CUDA_RADIX_CIPHERTEXT_H
 
-void release_radix_ciphertext_async(cudaStream_t const stream,
+void release_radix_ciphertext_async(hipStream_t const stream,
                                     uint32_t const gpu_index,
                                     CudaRadixCiphertextFFI *data,
                                     const bool gpu_memory_allocated);

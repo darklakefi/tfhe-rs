@@ -46,7 +46,7 @@ __host__ void accumulate_all_blocks(hipStream_t stream, uint32_t gpu_index,
   // Add all blocks and store in sum
   device_accumulate_all_blocks<Torus><<<num_blocks, num_threads, 0, stream>>>(
       output, input, lwe_dimension, num_radix_blocks);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 /* This takes an array of lwe ciphertexts, where each is an encryption of

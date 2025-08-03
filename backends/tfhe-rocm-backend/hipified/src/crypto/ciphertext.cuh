@@ -7,7 +7,7 @@
 #include <cstdint>
 
 template <typename T>
-void cuda_convert_lwe_ciphertext_vector_to_gpu(cudaStream_t stream,
+void cuda_convert_lwe_ciphertext_vector_to_gpu(hipStream_t stream,
                                                uint32_t gpu_index, T *dest,
                                                T *src, uint32_t number_of_cts,
                                                uint32_t lwe_dimension) {
@@ -17,7 +17,7 @@ void cuda_convert_lwe_ciphertext_vector_to_gpu(cudaStream_t stream,
 }
 
 template <typename T>
-void cuda_convert_lwe_ciphertext_vector_to_cpu(cudaStream_t stream,
+void cuda_convert_lwe_ciphertext_vector_to_cpu(hipStream_t stream,
                                                uint32_t gpu_index, T *dest,
                                                T *src, uint32_t number_of_cts,
                                                uint32_t lwe_dimension) {
@@ -52,7 +52,7 @@ __global__ void sample_extract(Torus *lwe_array_out, Torus const *glwe_array_in,
 // enough indexes
 template <typename Torus, class params>
 __host__ void
-host_sample_extract(cudaStream_t stream, uint32_t gpu_index,
+host_sample_extract(hipStream_t stream, uint32_t gpu_index,
                     Torus *lwe_array_out, Torus const *glwe_array_in,
                     uint32_t const *nth_array, uint32_t num_nths,
                     uint32_t lwe_per_glwe, uint32_t glwe_dimension) {
@@ -61,7 +61,7 @@ host_sample_extract(cudaStream_t stream, uint32_t gpu_index,
   dim3 thds(params::degree / params::opt);
   sample_extract<Torus, params><<<grid, thds, 0, stream>>>(
       lwe_array_out, glwe_array_in, nth_array, lwe_per_glwe, glwe_dimension);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 #endif

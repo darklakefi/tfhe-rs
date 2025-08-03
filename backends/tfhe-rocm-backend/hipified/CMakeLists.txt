@@ -124,12 +124,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -fopenmp=libomp")
 
 # ROCm/HIP specific compiler flags
 set(CMAKE_HIP_FLAGS "${CMAKE_HIP_FLAGS} ${OpenMP_CXX_FLAGS}")
 set(CMAKE_HIP_FLAGS "${CMAKE_HIP_FLAGS} -fPIC")
-set(CMAKE_HIP_FLAGS "${CMAKE_HIP_FLAGS} -std=c++17")
+set(CMAKE_HIP_FLAGS "${CMAKE_HIP_FLAGS} -std=c++17 -fopenmp=libomp")
 
 # Set architecture-specific flags
 if(${MULTI_ARCH})

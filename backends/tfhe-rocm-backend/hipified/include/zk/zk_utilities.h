@@ -22,7 +22,7 @@ template <typename Torus> struct zk_expand_mem {
   uint32_t *d_body_id_per_compact_list;
   bool gpu_memory_allocated;
 
-  zk_expand_mem(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  zk_expand_mem(hipStream_t const *streams, uint32_t const *gpu_indexes,
                 uint32_t gpu_count, int_radix_params computing_params,
                 int_radix_params casting_params, KS_TYPE casting_key_type,
                 const uint32_t *num_lwes_per_compact_list,
@@ -252,7 +252,7 @@ template <typename Torus> struct zk_expand_mem {
     free(h_lwe_compact_input_indexes);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     message_and_carry_extract_luts->release(streams, gpu_indexes, gpu_count);

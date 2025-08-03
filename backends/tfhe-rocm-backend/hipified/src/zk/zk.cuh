@@ -17,7 +17,7 @@
 
 template <typename Torus>
 __host__ void host_expand_without_verification(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, Torus *lwe_array_out,
     const Torus *lwe_flattened_compact_array_in, zk_expand_mem<Torus> *mem_ptr,
     Torus *const *casting_keys, void *const *bsks, Torus *const *compute_ksks,
@@ -83,7 +83,7 @@ __host__ void host_expand_without_verification(
 
 template <typename Torus>
 __host__ uint64_t scratch_cuda_expand_without_verification(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, zk_expand_mem<Torus> **mem_ptr,
     const uint32_t *num_lwes_per_compact_list, const bool *is_boolean_array,
     uint32_t num_compact_lists, int_radix_params computing_params,

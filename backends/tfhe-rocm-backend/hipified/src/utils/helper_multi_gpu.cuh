@@ -5,7 +5,7 @@
 
 /// Initialize same-size arrays on all active gpus
 template <typename Torus>
-void multi_gpu_alloc_array_async(cudaStream_t const *streams,
+void multi_gpu_alloc_array_async(hipStream_t const *streams,
                                  uint32_t const *gpu_indexes,
                                  uint32_t gpu_count, std::vector<Torus *> &dest,
                                  uint32_t elements_per_gpu,
@@ -26,7 +26,7 @@ void multi_gpu_alloc_array_async(cudaStream_t const *streams,
 }
 /// Copy an array residing on one GPU to all active gpus
 template <typename Torus>
-void multi_gpu_copy_array_async(cudaStream_t const *streams,
+void multi_gpu_copy_array_async(hipStream_t const *streams,
                                 uint32_t const *gpu_indexes, uint32_t gpu_count,
                                 std::vector<Torus *> &dest, Torus const *src,
                                 uint32_t elements_per_gpu,
@@ -42,7 +42,7 @@ void multi_gpu_copy_array_async(cudaStream_t const *streams,
 /// Initializes also the related indexing and initializes it to the trivial
 /// index
 template <typename Torus>
-void multi_gpu_alloc_lwe_async(cudaStream_t const *streams,
+void multi_gpu_alloc_lwe_async(hipStream_t const *streams,
                                uint32_t const *gpu_indexes, uint32_t gpu_count,
                                std::vector<Torus *> &dest, uint32_t num_inputs,
                                uint32_t lwe_size,
@@ -63,7 +63,7 @@ void multi_gpu_alloc_lwe_async(cudaStream_t const *streams,
 }
 
 template void multi_gpu_alloc_lwe_async<__uint128_t>(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, std::vector<__uint128_t *> &dest, uint32_t num_inputs,
     uint32_t lwe_size, uint64_t &size_tracker_on_gpu_0,
     bool allocate_gpu_memory);
@@ -73,7 +73,7 @@ template void multi_gpu_alloc_lwe_async<__uint128_t>(
 /// index
 template <typename Torus>
 void multi_gpu_alloc_lwe_many_lut_output_async(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, std::vector<Torus *> &dest, uint32_t num_inputs,
     uint32_t num_many_lut, uint32_t lwe_size, uint64_t &size_tracker_on_gpu_0,
     bool allocate_gpu_memory) {
@@ -96,7 +96,7 @@ void multi_gpu_alloc_lwe_many_lut_output_async(
 /// The input indexing logic is given by an index array.
 /// The output indexing is always the trivial one
 template <typename Torus>
-void multi_gpu_scatter_lwe_async(cudaStream_t const *streams,
+void multi_gpu_scatter_lwe_async(hipStream_t const *streams,
                                  uint32_t const *gpu_indexes,
                                  uint32_t gpu_count, std::vector<Torus *> &dest,
                                  Torus const *src, Torus const *h_src_indexes,
@@ -138,7 +138,7 @@ void multi_gpu_scatter_lwe_async(cudaStream_t const *streams,
 /// dest_indexes
 /// The input indexing should be the trivial one
 template <typename Torus>
-void multi_gpu_gather_lwe_async(cudaStream_t const *streams,
+void multi_gpu_gather_lwe_async(hipStream_t const *streams,
                                 uint32_t const *gpu_indexes, uint32_t gpu_count,
                                 Torus *dest, const std::vector<Torus *> &src,
                                 Torus *h_dest_indexes, bool is_trivial_index,
@@ -178,7 +178,7 @@ void multi_gpu_gather_lwe_async(cudaStream_t const *streams,
 /// The input indexing should be the trivial one
 template <typename Torus>
 void multi_gpu_gather_many_lut_lwe_async(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, Torus *dest, const std::vector<Torus *> &src,
     Torus *h_dest_indexes, bool is_trivial_index, uint32_t num_inputs,
     uint32_t lwe_size, uint32_t num_many_lut) {
@@ -218,7 +218,7 @@ void multi_gpu_gather_many_lut_lwe_async(
 }
 
 template <typename Torus>
-void multi_gpu_release_async(cudaStream_t const *streams,
+void multi_gpu_release_async(hipStream_t const *streams,
                              uint32_t const *gpu_indexes,
                              std::vector<Torus *> &vec) {
 
@@ -226,7 +226,7 @@ void multi_gpu_release_async(cudaStream_t const *streams,
     cuda_drop_async(vec[i], streams[i], gpu_indexes[i]);
 }
 template void
-multi_gpu_release_async<__uint128_t>(cudaStream_t const *streams,
+multi_gpu_release_async<__uint128_t>(hipStream_t const *streams,
                                      uint32_t const *gpu_indexes,
                                      std::vector<__uint128_t *> &vec);
 

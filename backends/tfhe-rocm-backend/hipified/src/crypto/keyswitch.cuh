@@ -136,7 +136,7 @@ __host__ void host_keyswitch_lwe_ciphertext_vector(
   keyswitch<Torus><<<grid, threads, shared_mem, stream>>>(
       lwe_array_out, lwe_output_indexes, lwe_array_in, lwe_input_indexes, ksk,
       lwe_dimension_in, lwe_dimension_out, base_log, level_count);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename Torus>

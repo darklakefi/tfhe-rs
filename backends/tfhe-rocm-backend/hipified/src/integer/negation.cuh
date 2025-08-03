@@ -90,7 +90,7 @@ __host__ void host_integer_radix_negation(
       static_cast<Torus *>(lwe_array_out->ptr),
       static_cast<Torus *>(lwe_array_in->ptr), num_radix_blocks, lwe_dimension,
       message_modulus, delta);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   uint8_t zb = 0;
   for (uint i = 0; i < lwe_array_out->num_radix_blocks; i++) {

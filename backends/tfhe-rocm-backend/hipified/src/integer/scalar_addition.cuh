@@ -50,7 +50,7 @@ __host__ void host_integer_radix_scalar_addition_inplace(
       <<<grid, thds, 0, streams[0]>>>((Torus *)lwe_array->ptr, scalar_input,
                                       num_scalars, lwe_array->lwe_dimension,
                                       delta);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
   for (uint i = 0; i < num_scalars; i++) {
     lwe_array->degrees[i] = lwe_array->degrees[i] + h_scalar_input[i];
   }
@@ -91,7 +91,7 @@ __host__ void host_integer_radix_add_scalar_one_inplace(
       <<<grid, thds, 0, streams[0]>>>((Torus *)lwe_array->ptr,
                                       lwe_array->num_radix_blocks,
                                       lwe_array->lwe_dimension, delta);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
   for (uint i = 0; i < lwe_array->num_radix_blocks; i++) {
     lwe_array->degrees[i] = lwe_array->degrees[i] + 1;
   }
@@ -135,6 +135,6 @@ __host__ void host_integer_radix_scalar_subtraction_inplace(
       <<<grid, thds, 0, streams[0]>>>(lwe_array, scalar_input,
                                       input_lwe_ciphertext_count, lwe_dimension,
                                       delta);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 #endif

@@ -417,9 +417,9 @@ __host__ void host_integer_partial_sum_ciphertexts_vec_kb(
     } else {
       Torus *h_lwe_indexes_in_pinned;
       Torus *h_lwe_indexes_out_pinned;
-      cudaMallocHost((void **)&h_lwe_indexes_in_pinned,
+      hipMallocHost((void **)&h_lwe_indexes_in_pinned,
                      total_ciphertexts * sizeof(Torus));
-      cudaMallocHost((void **)&h_lwe_indexes_out_pinned,
+      hipMallocHost((void **)&h_lwe_indexes_out_pinned,
                      total_ciphertexts * sizeof(Torus));
       for (uint32_t i = 0; i < total_ciphertexts; i++) {
         h_lwe_indexes_in_pinned[i] = luts_message_carry->h_lwe_indexes_in[i];
@@ -436,8 +436,8 @@ __host__ void host_integer_partial_sum_ciphertexts_vec_kb(
         luts_message_carry->h_lwe_indexes_in[i] = h_lwe_indexes_in_pinned[i];
         luts_message_carry->h_lwe_indexes_out[i] = h_lwe_indexes_out_pinned[i];
       }
-      cudaFreeHost(h_lwe_indexes_in_pinned);
-      cudaFreeHost(h_lwe_indexes_out_pinned);
+      hipFreeHost(h_lwe_indexes_in_pinned);
+      hipFreeHost(h_lwe_indexes_out_pinned);
 
       luts_message_carry->broadcast_lut(streams, gpu_indexes);
       luts_message_carry->using_trivial_lwe_indexes = false;
@@ -493,9 +493,9 @@ __host__ void host_integer_partial_sum_ciphertexts_vec_kb(
       uint32_t num_blocks_in_apply_lut = 2 * num_radix_blocks;
       Torus *h_lwe_indexes_in_pinned;
       Torus *h_lwe_indexes_out_pinned;
-      cudaMallocHost((void **)&h_lwe_indexes_in_pinned,
+      hipMallocHost((void **)&h_lwe_indexes_in_pinned,
                      num_blocks_in_apply_lut * sizeof(Torus));
-      cudaMallocHost((void **)&h_lwe_indexes_out_pinned,
+      hipMallocHost((void **)&h_lwe_indexes_out_pinned,
                      num_blocks_in_apply_lut * sizeof(Torus));
       for (uint32_t i = 0; i < num_blocks_in_apply_lut; i++) {
         h_lwe_indexes_in_pinned[i] = luts_message_carry->h_lwe_indexes_in[i];
@@ -512,8 +512,8 @@ __host__ void host_integer_partial_sum_ciphertexts_vec_kb(
         luts_message_carry->h_lwe_indexes_in[i] = h_lwe_indexes_in_pinned[i];
         luts_message_carry->h_lwe_indexes_out[i] = h_lwe_indexes_out_pinned[i];
       }
-      cudaFreeHost(h_lwe_indexes_in_pinned);
-      cudaFreeHost(h_lwe_indexes_out_pinned);
+      hipFreeHost(h_lwe_indexes_in_pinned);
+      hipFreeHost(h_lwe_indexes_out_pinned);
 
       luts_message_carry->broadcast_lut(streams, gpu_indexes);
       luts_message_carry->using_trivial_lwe_indexes = false;
@@ -638,7 +638,7 @@ __host__ void host_integer_mult_radix_kb(
       (Torus *)radix_lwe_left->ptr, (Torus *)vector_result_lsb->ptr,
       (Torus *)vector_result_msb.ptr, (Torus *)radix_lwe_right->ptr,
       (Torus *)vector_lsb_rhs->ptr, (Torus *)vector_msb_rhs.ptr, num_blocks);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   integer_radix_apply_bivariate_lookup_table_kb<Torus>(
       streams, gpu_indexes, gpu_count, block_mul_res, block_mul_res,
@@ -656,7 +656,7 @@ __host__ void host_integer_mult_radix_kb(
          streams[0]>>>(
           (Torus *)vector_result_sb->ptr, (Torus *)vector_result_lsb->ptr,
           (Torus *)vector_result_msb.ptr, big_lwe_size, num_blocks);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   for (int i = 0; i < num_blocks * num_blocks; i++) {
     size_t r_id = i / num_blocks;

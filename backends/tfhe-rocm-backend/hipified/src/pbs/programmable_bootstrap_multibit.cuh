@@ -1,7 +1,7 @@
 #ifndef CUDA_MULTIBIT_PBS_CUH
 #define CUDA_MULTIBIT_PBS_CUH
 
-#include "cooperative_groups.h"
+#include "hip/hip_cooperative_groups.h"
 #include "crypto/gadget.cuh"
 #include "crypto/ggsw.cuh"
 #include "crypto/torus.cuh"
@@ -380,7 +380,7 @@ uint64_t get_buffer_size_full_sm_multibit_programmable_bootstrap_step_two(
 
 template <typename Torus, typename params>
 __host__ uint64_t scratch_multi_bit_programmable_bootstrap(
-    cudaStream_t stream, uint32_t gpu_index,
+    hipStream_t stream, uint32_t gpu_index,
     pbs_buffer<Torus, MULTI_BIT> **buffer, uint32_t glwe_dimension,
     uint32_t polynomial_size, uint32_t level_count,
     uint32_t input_lwe_ciphertext_count, bool allocate_gpu_memory) {
@@ -402,123 +402,123 @@ __host__ uint64_t scratch_multi_bit_programmable_bootstrap(
           Torus>(polynomial_size);
 
   if (max_shared_memory < full_sm_keybundle) {
-    check_cuda_error(cudaFuncSetAttribute(
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_keybundle<Torus, params, NOSM>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize, 0));
-    cudaFuncSetCacheConfig(
+        hipFuncAttributeMaxDynamicSharedMemorySize, 0));
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_keybundle<Torus, params, NOSM>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaGetLastError());
+        hipFuncCachePreferShared);
+    check_cuda_error(hipGetLastError());
   } else {
-    check_cuda_error(cudaFuncSetAttribute(
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_keybundle<Torus, params,
                                                           FULLSM>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize, full_sm_keybundle));
-    cudaFuncSetCacheConfig(
+        hipFuncAttributeMaxDynamicSharedMemorySize, full_sm_keybundle));
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_keybundle<Torus, params,
                                                           FULLSM>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaGetLastError());
+        hipFuncCachePreferShared);
+    check_cuda_error(hipGetLastError());
   }
 
   if (max_shared_memory < partial_sm_accumulate_step_one) {
-    check_cuda_error(cudaFuncSetAttribute(
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, NOSM, false>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize, 0));
-    cudaFuncSetCacheConfig(
+        hipFuncAttributeMaxDynamicSharedMemorySize, 0));
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, NOSM, false>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaFuncSetAttribute(
+        hipFuncCachePreferShared);
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, NOSM, true>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize, 0));
-    cudaFuncSetCacheConfig(
+        hipFuncAttributeMaxDynamicSharedMemorySize, 0));
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, NOSM, true>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaGetLastError());
+        hipFuncCachePreferShared);
+    check_cuda_error(hipGetLastError());
   } else if (max_shared_memory < full_sm_accumulate_step_one) {
-    check_cuda_error(cudaFuncSetAttribute(
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, PARTIALSM, false>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize,
+        hipFuncAttributeMaxDynamicSharedMemorySize,
         partial_sm_accumulate_step_one));
-    cudaFuncSetCacheConfig(
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, PARTIALSM, false>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaFuncSetAttribute(
+        hipFuncCachePreferShared);
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, PARTIALSM, true>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize,
+        hipFuncAttributeMaxDynamicSharedMemorySize,
         partial_sm_accumulate_step_one));
-    cudaFuncSetCacheConfig(
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, PARTIALSM, true>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaGetLastError());
+        hipFuncCachePreferShared);
+    check_cuda_error(hipGetLastError());
   } else {
-    check_cuda_error(cudaFuncSetAttribute(
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, FULLSM, false>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize,
+        hipFuncAttributeMaxDynamicSharedMemorySize,
         full_sm_accumulate_step_one));
-    cudaFuncSetCacheConfig(
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, FULLSM, false>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaFuncSetAttribute(
+        hipFuncCachePreferShared);
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, FULLSM, true>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize,
+        hipFuncAttributeMaxDynamicSharedMemorySize,
         full_sm_accumulate_step_one));
-    cudaFuncSetCacheConfig(
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_accumulate_step_one<
             Torus, params, FULLSM, true>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaGetLastError());
+        hipFuncCachePreferShared);
+    check_cuda_error(hipGetLastError());
   }
 
   if (max_shared_memory < full_sm_accumulate_step_two) {
-    check_cuda_error(cudaFuncSetAttribute(
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_accumulate_step_two<
             Torus, params, NOSM, false>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize, 0));
-    cudaFuncSetCacheConfig(
+        hipFuncAttributeMaxDynamicSharedMemorySize, 0));
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_accumulate_step_two<
             Torus, params, NOSM, false>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaFuncSetAttribute(
+        hipFuncCachePreferShared);
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_accumulate_step_two<
             Torus, params, NOSM, true>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize, 0));
-    cudaFuncSetCacheConfig(
+        hipFuncAttributeMaxDynamicSharedMemorySize, 0));
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_accumulate_step_two<
             Torus, params, NOSM, true>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaGetLastError());
+        hipFuncCachePreferShared);
+    check_cuda_error(hipGetLastError());
   } else {
     check_cuda_error(cudaFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_accumulate_step_two<
             Torus, params, FULLSM, false>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize,
+        hipFuncAttributeMaxDynamicSharedMemorySize,
         full_sm_accumulate_step_two));
-    cudaFuncSetCacheConfig(
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_accumulate_step_two<
             Torus, params, FULLSM, false>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaFuncSetAttribute(
+        hipFuncCachePreferShared);
+    check_cuda_error(hipFuncSetAttribute(
         device_multi_bit_programmable_bootstrap_accumulate_step_two<
             Torus, params, FULLSM, true>,
-        cudaFuncAttributeMaxDynamicSharedMemorySize,
+        hipFuncAttributeMaxDynamicSharedMemorySize,
         full_sm_accumulate_step_two));
-    cudaFuncSetCacheConfig(
+    hipFuncSetCacheConfig(
         device_multi_bit_programmable_bootstrap_accumulate_step_two<
             Torus, params, FULLSM, true>,
-        cudaFuncCachePreferShared);
-    check_cuda_error(cudaGetLastError());
+        hipFuncCachePreferShared);
+    check_cuda_error(hipGetLastError());
   }
 
   auto lwe_chunk_size =
@@ -534,7 +534,7 @@ __host__ uint64_t scratch_multi_bit_programmable_bootstrap(
 
 template <typename Torus, class params>
 __host__ void execute_compute_keybundle(
-    cudaStream_t stream, uint32_t gpu_index, Torus const *lwe_array_in,
+    hipStream_t stream, uint32_t gpu_index, Torus const *lwe_array_in,
     Torus const *lwe_input_indexes, Torus const *bootstrapping_key,
     pbs_buffer<Torus, MULTI_BIT> *buffer, uint32_t num_samples,
     uint32_t lwe_dimension, uint32_t glwe_dimension, uint32_t polynomial_size,
@@ -576,12 +576,12 @@ __host__ void execute_compute_keybundle(
             lwe_dimension, glwe_dimension, polynomial_size, grouping_factor,
             level_count, lwe_offset, chunk_size, keybundle_size_per_input,
             d_mem, 0);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename Torus, class params, bool is_first_iter>
 __host__ void execute_step_one(
-    cudaStream_t stream, uint32_t gpu_index, Torus const *lut_vector,
+    hipStream_t stream, uint32_t gpu_index, Torus const *lut_vector,
     Torus const *lut_vector_indexes, Torus const *lwe_array_in,
     Torus const *lwe_input_indexes, pbs_buffer<Torus, MULTI_BIT> *buffer,
     uint32_t num_samples, uint32_t lwe_dimension, uint32_t glwe_dimension,
@@ -629,12 +629,12 @@ __host__ void execute_step_one(
                      lut_vector_indexes, global_accumulator,
                      global_accumulator_fft, lwe_dimension, glwe_dimension,
                      polynomial_size, base_log, level_count, d_mem, 0);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename Torus, class params, bool is_last_iter>
 __host__ void
-execute_step_two(cudaStream_t stream, uint32_t gpu_index, Torus *lwe_array_out,
+execute_step_two(hipStream_t stream, uint32_t gpu_index, Torus *lwe_array_out,
                  Torus const *lwe_output_indexes,
                  pbs_buffer<Torus, MULTI_BIT> *buffer, uint32_t num_samples,
                  uint32_t glwe_dimension, uint32_t polynomial_size,
@@ -672,12 +672,12 @@ execute_step_two(cudaStream_t stream, uint32_t gpu_index, Torus *lwe_array_out,
                      global_accumulator, global_accumulator_fft, glwe_dimension,
                      polynomial_size, level_count, j, lwe_chunk_size, d_mem, 0,
                      num_many_lut, lut_stride);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename Torus, class params>
 __host__ void host_multi_bit_programmable_bootstrap(
-    cudaStream_t stream, uint32_t gpu_index, Torus *lwe_array_out,
+    hipStream_t stream, uint32_t gpu_index, Torus *lwe_array_out,
     Torus const *lwe_output_indexes, Torus const *lut_vector,
     Torus const *lut_vector_indexes, Torus const *lwe_array_in,
     Torus const *lwe_input_indexes, Torus const *bootstrapping_key,

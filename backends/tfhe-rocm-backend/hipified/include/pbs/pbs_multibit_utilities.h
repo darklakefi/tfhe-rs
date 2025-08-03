@@ -118,7 +118,7 @@ template <typename Torus> struct pbs_buffer<Torus, PBS_TYPE::MULTI_BIT> {
   PBS_VARIANT pbs_variant;
   bool gpu_memory_allocated;
 
-  pbs_buffer(cudaStream_t stream, uint32_t gpu_index, uint32_t glwe_dimension,
+  pbs_buffer(hipStream_t stream, uint32_t gpu_index, uint32_t glwe_dimension,
              uint32_t polynomial_size, uint32_t level_count,
              uint32_t input_lwe_ciphertext_count, uint32_t lwe_chunk_size,
              PBS_VARIANT pbs_variant, bool allocate_gpu_memory,
@@ -249,7 +249,7 @@ template <typename Torus> struct pbs_buffer<Torus, PBS_TYPE::MULTI_BIT> {
         stream, gpu_index, size_tracker, allocate_gpu_memory);
   }
 
-  void release(cudaStream_t stream, uint32_t gpu_index) {
+  void release(hipStream_t stream, uint32_t gpu_index) {
 
     if (d_mem_keybundle)
       cuda_drop_with_size_tracking_async(d_mem_keybundle, stream, gpu_index,
@@ -303,7 +303,7 @@ struct pbs_buffer_128<InputTorus, PBS_TYPE::MULTI_BIT> {
   PBS_VARIANT pbs_variant;
   bool gpu_memory_allocated;
 
-  pbs_buffer_128(cudaStream_t stream, uint32_t gpu_index,
+  pbs_buffer_128(hipStream_t stream, uint32_t gpu_index,
                  uint32_t glwe_dimension, uint32_t polynomial_size,
                  uint32_t level_count, uint32_t input_lwe_ciphertext_count,
                  uint32_t lwe_chunk_size, PBS_VARIANT pbs_variant,
@@ -398,7 +398,7 @@ struct pbs_buffer_128<InputTorus, PBS_TYPE::MULTI_BIT> {
         stream, gpu_index, size_tracker, allocate_gpu_memory);
   }
 
-  void release(cudaStream_t stream, uint32_t gpu_index) {
+  void release(hipStream_t stream, uint32_t gpu_index) {
 
     if (d_mem_keybundle)
       cuda_drop_with_size_tracking_async(d_mem_keybundle, stream, gpu_index,

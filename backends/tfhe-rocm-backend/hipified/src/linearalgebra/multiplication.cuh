@@ -30,7 +30,7 @@ __global__ void cleartext_vec_multiplication(T *output, T const *lwe_input,
 
 template <typename T>
 __host__ void host_cleartext_vec_multiplication(
-    cudaStream_t stream, uint32_t gpu_index, T *output, T const *lwe_input,
+    hipStream_t stream, uint32_t gpu_index, T *output, T const *lwe_input,
     T const *cleartext_input, const uint32_t input_lwe_dimension,
     const uint32_t input_lwe_ciphertext_count) {
 
@@ -47,7 +47,7 @@ __host__ void host_cleartext_vec_multiplication(
 
   cleartext_vec_multiplication<T><<<grid, thds, 0, stream>>>(
       output, lwe_input, cleartext_input, input_lwe_dimension, num_entries);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename T>
@@ -65,7 +65,7 @@ cleartext_multiplication(T *output, T const *lwe_input, T cleartext_input,
 
 template <typename T>
 __host__ void
-host_cleartext_multiplication(cudaStream_t stream, uint32_t gpu_index,
+host_cleartext_multiplication(hipStream_t stream, uint32_t gpu_index,
                               T *output, T const *lwe_input, T cleartext_input,
                               uint32_t input_lwe_dimension,
                               uint32_t input_lwe_ciphertext_count) {
@@ -83,7 +83,7 @@ host_cleartext_multiplication(cudaStream_t stream, uint32_t gpu_index,
 
   cleartext_multiplication<T><<<grid, thds, 0, stream>>>(
       output, lwe_input, cleartext_input, input_lwe_dimension, num_entries);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 const int BLOCK_SIZE_GEMM = 64;

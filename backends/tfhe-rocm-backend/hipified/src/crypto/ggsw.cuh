@@ -49,7 +49,7 @@ __global__ void device_batch_fft_ggsw_vector(double2 *dest, T *src,
  * global memory
  */
 template <typename T, typename ST, class params>
-void batch_fft_ggsw_vector(cudaStream_t *streams, uint32_t *gpu_indexes,
+void batch_fft_ggsw_vector(hipStream_t *streams, uint32_t *gpu_indexes,
                            uint32_t gpu_count, double2 *dest, T *src,
                            int8_t *d_mem, uint32_t r, uint32_t glwe_dim,
                            uint32_t polynomial_size, uint32_t level_count,
@@ -72,7 +72,7 @@ void batch_fft_ggsw_vector(cudaStream_t *streams, uint32_t *gpu_indexes,
         <<<gridSize, blockSize, shared_memory_size, streams[0]>>>(dest, src,
                                                                   d_mem);
   }
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 #endif // CNCRT_GGSW_CUH

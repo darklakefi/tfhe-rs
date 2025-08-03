@@ -47,7 +47,7 @@ scratch_wrapping_polynomial_mul_one_to_many(void *stream, uint32_t gpu_index,
   // allocate circulant matrix memory
   *circulant_buf = (int8_t *)cuda_malloc_async(
       sizeof(Torus) * polynomial_size * polynomial_size,
-      static_cast<cudaStream_t>(stream), gpu_index);
+      static_cast<hipStream_t>(stream), gpu_index);
 }
 
 template <typename Torus>
@@ -55,7 +55,7 @@ __host__ void
 cleanup_wrapping_polynomial_mul_one_to_many(void *stream, uint32_t gpu_index,
                                             int8_t *circulant_buf) {
   // free circulant matrix memory
-  cuda_drop_async(circulant_buf, static_cast<cudaStream_t>(stream), gpu_index);
+  cuda_drop_async(circulant_buf, static_cast<hipStream_t>(stream), gpu_index);
 }
 
 // Multiply degree-N lhs polynomial with many rhs polynomials
@@ -64,7 +64,7 @@ cleanup_wrapping_polynomial_mul_one_to_many(void *stream, uint32_t gpu_index,
 // compute the polynomial multiplication
 template <typename Torus, typename TorusVec>
 __host__ void host_wrapping_polynomial_mul_one_to_many(
-    cudaStream_t stream, uint32_t gpu_index, Torus *result,
+    hipStream_t stream, uint32_t gpu_index, Torus *result,
     const Torus *poly_lhs, int8_t *circulant, const Torus *poly_rhs,
     uint32_t polynomial_size, uint32_t glwe_dimension, uint32_t n_rhs) {
 
@@ -78,7 +78,7 @@ __host__ void host_wrapping_polynomial_mul_one_to_many(
   dim3 threads_c(CIRCULANT_BLOCKTILE, CIRCULANT_BLOCKTILE);
   polynomial_make_circulant<Torus><<<grid_c, threads_c, 0, stream>>>(
       (Torus *)circulant, poly_lhs, polynomial_size);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   // matmul circulant matrix with poly list
   dim3 grid_gemm(CEIL_DIV(polynomial_size, BLOCK_SIZE_GEMM),
@@ -92,12 +92,12 @@ __host__ void host_wrapping_polynomial_mul_one_to_many(
   tgemm<Torus><<<grid_gemm, threads_gemm, sharedMemSize, stream>>>(
       n_rhs, polynomial_size, polynomial_size, poly_rhs, (Torus *)circulant,
       polynomial_size, result, (polynomial_size * (glwe_dimension + 1)));
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename Torus, typename TorusVec>
 __host__ void host_glwe_wrapping_polynomial_mul_one_to_many(
-    cudaStream_t stream, uint32_t gpu_index, Torus *result,
+    hipStream_t stream, uint32_t gpu_index, Torus *result,
     const Torus *glwe_lhs, int8_t *circulant, const Torus *poly_rhs,
     uint32_t polynomial_size, uint32_t glwe_dimension, uint32_t n_rhs) {
   uint64_t const *glwe_lhs_t = static_cast<uint64_t const *>(glwe_lhs);

@@ -71,14 +71,14 @@ void generate_ids_update_degrees(uint64_t *terms_degree, size_t *h_lwe_idx_in,
  */
 template <typename Torus>
 void generate_device_accumulator_bivariate(
-    cudaStream_t stream, uint32_t gpu_index, Torus *acc_bivariate,
+    hipStream_t stream, uint32_t gpu_index, Torus *acc_bivariate,
     uint64_t *degree, uint64_t *max_degree, uint32_t glwe_dimension,
     uint32_t polynomial_size, uint32_t message_modulus, uint32_t carry_modulus,
     std::function<Torus(Torus, Torus)> f, bool gpu_memory_allocated);
 
 template <typename Torus>
 void generate_device_accumulator_bivariate_with_factor(
-    cudaStream_t stream, uint32_t gpu_index, Torus *acc_bivariate,
+    hipStream_t stream, uint32_t gpu_index, Torus *acc_bivariate,
     uint64_t *degree, uint64_t *max_degree, uint32_t glwe_dimension,
     uint32_t polynomial_size, uint32_t message_modulus, uint32_t carry_modulus,
     std::function<Torus(Torus, Torus)> f, int factor,
@@ -86,7 +86,7 @@ void generate_device_accumulator_bivariate_with_factor(
 
 template <typename Torus>
 void generate_device_accumulator_with_encoding(
-    cudaStream_t stream, uint32_t gpu_index, Torus *acc, uint64_t *degree,
+    hipStream_t stream, uint32_t gpu_index, Torus *acc, uint64_t *degree,
     uint64_t *max_degree, uint32_t glwe_dimension, uint32_t polynomial_size,
     uint32_t input_message_modulus, uint32_t input_carry_modulus,
     uint32_t output_message_modulus, uint32_t output_carry_modulus,
@@ -101,14 +101,14 @@ void generate_device_accumulator_with_encoding(
  */
 template <typename Torus>
 void generate_device_accumulator(
-    cudaStream_t stream, uint32_t gpu_index, Torus *acc, uint64_t *degree,
+    hipStream_t stream, uint32_t gpu_index, Torus *acc, uint64_t *degree,
     uint64_t *max_degree, uint32_t glwe_dimension, uint32_t polynomial_size,
     uint32_t message_modulus, uint32_t carry_modulus,
     std::function<Torus(Torus)> f, bool gpu_memory_allocated);
 
 template <typename Torus>
 void generate_many_lut_device_accumulator(
-    cudaStream_t stream, uint32_t gpu_index, Torus *acc, uint64_t *degrees,
+    hipStream_t stream, uint32_t gpu_index, Torus *acc, uint64_t *degrees,
     uint64_t *max_degree, uint32_t glwe_dimension, uint32_t polynomial_size,
     uint32_t message_modulus, uint32_t carry_modulus,
     std::vector<std::function<Torus(Torus)>> &f, bool gpu_memory_allocated);
@@ -316,7 +316,7 @@ template <typename Torus> struct int_radix_lut {
   uint32_t *gpu_indexes;
   bool gpu_memory_allocated;
 
-  int_radix_lut(cudaStream_t const *streams, uint32_t const *input_gpu_indexes,
+  int_radix_lut(hipStream_t const *streams, uint32_t const *input_gpu_indexes,
                 uint32_t gpu_count, int_radix_params params, uint32_t num_luts,
                 uint32_t num_radix_blocks, bool allocate_gpu_memory,
                 uint64_t &size_tracker) {
@@ -439,7 +439,7 @@ template <typename Torus> struct int_radix_lut {
   }
 
   // constructor to reuse memory
-  int_radix_lut(cudaStream_t const *streams, uint32_t const *input_gpu_indexes,
+  int_radix_lut(hipStream_t const *streams, uint32_t const *input_gpu_indexes,
                 uint32_t gpu_count, int_radix_params params, uint32_t num_luts,
                 uint32_t num_radix_blocks, int_radix_lut *base_lut_object,
                 bool allocate_gpu_memory, uint64_t &size_tracker) {
@@ -531,7 +531,7 @@ template <typename Torus> struct int_radix_lut {
   }
 
   // Construction for many luts
-  int_radix_lut(cudaStream_t const *streams, uint32_t const *input_gpu_indexes,
+  int_radix_lut(hipStream_t const *streams, uint32_t const *input_gpu_indexes,
                 uint32_t gpu_count, int_radix_params params, uint32_t num_luts,
                 uint32_t num_radix_blocks, uint32_t num_many_lut,
                 bool allocate_gpu_memory, uint64_t &size_tracker) {
@@ -683,7 +683,7 @@ template <typename Torus> struct int_radix_lut {
 
   // If this function is called we assume the lwe_indexes_(in/out) are not the
   // trivial anymore and thus we disable optimizations
-  void set_lwe_indexes(cudaStream_t stream, uint32_t gpu_index,
+  void set_lwe_indexes(hipStream_t stream, uint32_t gpu_index,
                        Torus *h_indexes_in, Torus *h_indexes_out) {
 
     memcpy(h_lwe_indexes_in, h_indexes_in, num_blocks * sizeof(Torus));
@@ -700,7 +700,7 @@ template <typename Torus> struct int_radix_lut {
   }
 
   // Broadcast luts from device gpu_indexes[0] to all active gpus
-  void broadcast_lut(cudaStream_t const *streams, uint32_t const *gpu_indexes) {
+  void broadcast_lut(hipStream_t const *streams, uint32_t const *gpu_indexes) {
     int active_device = cuda_get_device();
 
     Torus lut_size = (params.glwe_dimension + 1) * params.polynomial_size;
@@ -726,7 +726,7 @@ template <typename Torus> struct int_radix_lut {
     cuda_set_device(active_device);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     free(this->gpu_indexes);
     for (uint i = 0; i < active_gpu_count; i++) {
@@ -834,7 +834,7 @@ template <typename InputTorus> struct int_noise_squashing_lut {
   bool using_trivial_lwe_indexes = true;
   bool gpu_memory_allocated;
   // noise squashing constructor
-  int_noise_squashing_lut(cudaStream_t const *streams,
+  int_noise_squashing_lut(hipStream_t const *streams,
                           uint32_t const *input_gpu_indexes, uint32_t gpu_count,
                           int_radix_params params,
                           uint32_t input_glwe_dimension,
@@ -951,7 +951,7 @@ template <typename InputTorus> struct int_noise_squashing_lut {
           params.carry_modulus, f_squash, allocate_gpu_memory);
     }
   }
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     free(this->gpu_indexes);
     for (uint i = 0; i < active_gpu_count; i++) {
@@ -996,7 +996,7 @@ template <typename Torus> struct int_bit_extract_luts_buffer {
   bool gpu_memory_allocated;
 
   // With offset
-  int_bit_extract_luts_buffer(cudaStream_t const *streams,
+  int_bit_extract_luts_buffer(hipStream_t const *streams,
                               uint32_t const *gpu_indexes, uint32_t gpu_count,
                               int_radix_params params, uint32_t bits_per_block,
                               uint32_t final_offset, uint32_t num_radix_blocks,
@@ -1069,7 +1069,7 @@ template <typename Torus> struct int_bit_extract_luts_buffer {
   }
 
   // Without offset
-  int_bit_extract_luts_buffer(cudaStream_t const *streams,
+  int_bit_extract_luts_buffer(hipStream_t const *streams,
                               uint32_t const *gpu_indexes, uint32_t gpu_count,
                               int_radix_params params, uint32_t bits_per_block,
                               uint32_t num_radix_blocks,
@@ -1078,7 +1078,7 @@ template <typename Torus> struct int_bit_extract_luts_buffer {
                                     bits_per_block, 0, num_radix_blocks,
                                     allocate_gpu_memory, size_tracker) {}
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     lut->release(streams, gpu_indexes, gpu_count);
     delete (lut);
@@ -1105,7 +1105,7 @@ template <typename Torus> struct int_shift_and_rotate_buffer {
   Torus offset;
   bool gpu_memory_allocated;
 
-  int_shift_and_rotate_buffer(cudaStream_t const *streams,
+  int_shift_and_rotate_buffer(hipStream_t const *streams,
                               uint32_t const *gpu_indexes, uint32_t gpu_count,
                               SHIFT_OR_ROTATE_TYPE shift_type, bool is_signed,
                               int_radix_params params,
@@ -1216,7 +1216,7 @@ template <typename Torus> struct int_shift_and_rotate_buffer {
     cleaning_lut->broadcast_lut(streams, gpu_indexes);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     release_radix_ciphertext_async(streams[0], gpu_indexes[0], tmp_bits,
                                    gpu_memory_allocated);
@@ -1258,7 +1258,7 @@ template <typename Torus> struct int_fullprop_buffer {
   CudaRadixCiphertextFFI *tmp_big_lwe_vector;
   bool gpu_memory_allocated;
 
-  int_fullprop_buffer(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  int_fullprop_buffer(hipStream_t const *streams, uint32_t const *gpu_indexes,
                       uint32_t gpu_count, int_radix_params params,
                       bool allocate_gpu_memory, uint64_t &size_tracker) {
     this->params = params;
@@ -1317,7 +1317,7 @@ template <typename Torus> struct int_fullprop_buffer {
     free(h_lwe_indexes);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     release_radix_ciphertext_async(streams[0], gpu_indexes[0],
@@ -1342,7 +1342,7 @@ template <typename Torus> struct int_overflowing_sub_memory {
   int_radix_params params;
   bool gpu_memory_allocated;
 
-  int_overflowing_sub_memory(cudaStream_t const *streams,
+  int_overflowing_sub_memory(hipStream_t const *streams,
                              uint32_t const *gpu_indexes, uint32_t gpu_count,
                              int_radix_params params, uint32_t num_radix_blocks,
                              bool allocate_gpu_memory, uint64_t &size_tracker) {
@@ -1443,7 +1443,7 @@ template <typename Torus> struct int_overflowing_sub_memory {
     message_acc->broadcast_lut(streams, gpu_indexes);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     cuda_drop_with_size_tracking_async(generates_or_propagates, streams[0],
                                        gpu_indexes[0], gpu_memory_allocated);
@@ -1490,7 +1490,7 @@ template <typename Torus> struct int_sum_ciphertexts_vec_memory {
   bool mem_reuse = false;
   bool allocated_luts_message_carry;
 
-  void setup_index_buffers(cudaStream_t const *streams,
+  void setup_index_buffers(hipStream_t const *streams,
                            uint32_t const *gpu_indexes,
                            uint64_t &size_tracker) {
 
@@ -1536,7 +1536,7 @@ template <typename Torus> struct int_sum_ciphertexts_vec_memory {
                   size_tracker, gpu_memory_allocated);
   }
 
-  void setup_lookup_tables(cudaStream_t const *streams,
+  void setup_lookup_tables(hipStream_t const *streams,
                            uint32_t const *gpu_indexes, uint32_t gpu_count,
                            uint32_t num_radix_in_vec,
                            const uint64_t *const degrees) {
@@ -1590,7 +1590,7 @@ template <typename Torus> struct int_sum_ciphertexts_vec_memory {
     }
   }
   int_sum_ciphertexts_vec_memory(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, int_radix_params params, uint32_t num_blocks_in_radix,
       uint32_t max_num_radix_in_vec,
       bool reduce_degrees_for_single_carry_propagation,
@@ -1631,7 +1631,7 @@ template <typename Torus> struct int_sum_ciphertexts_vec_memory {
   }
 
   int_sum_ciphertexts_vec_memory(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, int_radix_params params, uint32_t num_blocks_in_radix,
       uint32_t max_num_radix_in_vec, CudaRadixCiphertextFFI *current_blocks,
       CudaRadixCiphertextFFI *small_lwe_vector,
@@ -1656,7 +1656,7 @@ template <typename Torus> struct int_sum_ciphertexts_vec_memory {
     setup_index_buffers(streams, gpu_indexes, size_tracker);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     cuda_drop_with_size_tracking_async(d_degrees, streams[0], gpu_indexes[0],
                                        gpu_memory_allocated);
@@ -1697,7 +1697,7 @@ template <typename Torus> struct int_seq_group_prop_memory {
   uint32_t grouping_size;
   bool gpu_memory_allocated;
 
-  int_seq_group_prop_memory(cudaStream_t const *streams,
+  int_seq_group_prop_memory(hipStream_t const *streams,
                             uint32_t const *gpu_indexes, uint32_t gpu_count,
                             int_radix_params params, uint32_t group_size,
                             uint32_t big_lwe_size_bytes,
@@ -1740,7 +1740,7 @@ template <typename Torus> struct int_seq_group_prop_memory {
     lut_sequential_algorithm->broadcast_lut(streams, gpu_indexes);
     free(h_seq_lut_indexes);
   };
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     release_radix_ciphertext_async(streams[0], gpu_indexes[0],
                                    group_resolved_carries,
@@ -1757,7 +1757,7 @@ template <typename Torus> struct int_hs_group_prop_memory {
   int_radix_lut<Torus> *lut_hillis_steele;
   bool gpu_memory_allocated;
 
-  int_hs_group_prop_memory(cudaStream_t const *streams,
+  int_hs_group_prop_memory(hipStream_t const *streams,
                            uint32_t const *gpu_indexes, uint32_t gpu_count,
                            int_radix_params params, uint32_t num_groups,
                            uint32_t big_lwe_size_bytes,
@@ -1795,7 +1795,7 @@ template <typename Torus> struct int_hs_group_prop_memory {
 
     lut_hillis_steele->broadcast_lut(streams, gpu_indexes);
   };
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     lut_hillis_steele->release(streams, gpu_indexes, gpu_count);
@@ -1813,7 +1813,7 @@ template <typename Torus> struct int_shifted_blocks_and_states_memory {
   bool gpu_memory_allocated;
 
   int_shifted_blocks_and_states_memory(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, int_radix_params params, uint32_t num_radix_blocks,
       uint32_t num_many_lut, uint32_t grouping_size, bool allocate_gpu_memory,
       uint64_t &size_tracker) {
@@ -1972,7 +1972,7 @@ template <typename Torus> struct int_shifted_blocks_and_states_memory {
 
     luts_array_first_step->broadcast_lut(streams, gpu_indexes);
   };
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     release_radix_ciphertext_async(streams[0], gpu_indexes[0],
@@ -2012,7 +2012,7 @@ template <typename Torus> struct int_prop_simu_group_carries_memory {
   bool gpu_memory_allocated;
 
   int_prop_simu_group_carries_memory(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, int_radix_params params, uint32_t num_radix_blocks,
       uint32_t grouping_size, uint32_t num_groups, bool allocate_gpu_memory,
       uint64_t &size_tracker) {
@@ -2249,7 +2249,7 @@ template <typename Torus> struct int_prop_simu_group_carries_memory {
   };
 
   // needed for the division to update the lut indexes
-  void update_lut_indexes(cudaStream_t const *streams,
+  void update_lut_indexes(hipStream_t const *streams,
                           uint32_t const *gpu_indexes, Torus *new_lut_indexes,
                           Torus *new_scalars, uint32_t new_num_blocks) {
     Torus *lut_indexes = luts_array_second_step->get_lut_indexes(0, 0);
@@ -2264,7 +2264,7 @@ template <typename Torus> struct int_prop_simu_group_carries_memory {
         streams[0], gpu_indexes[0], gpu_memory_allocated);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     release_radix_ciphertext_async(streams[0], gpu_indexes[0],
                                    propagation_cum_sums, gpu_memory_allocated);
@@ -2317,7 +2317,7 @@ template <typename Torus> struct int_sc_prop_memory {
   uint32_t requested_flag;
   bool gpu_memory_allocated;
 
-  int_sc_prop_memory(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  int_sc_prop_memory(hipStream_t const *streams, uint32_t const *gpu_indexes,
                      uint32_t gpu_count, int_radix_params params,
                      uint32_t num_radix_blocks, uint32_t requested_flag_in,
                      uint32_t uses_carry, bool allocate_gpu_memory,
@@ -2497,7 +2497,7 @@ template <typename Torus> struct int_sc_prop_memory {
     }
   };
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     shifted_blocks_state_mem->release(streams, gpu_indexes, gpu_count);
@@ -2532,7 +2532,7 @@ template <typename Torus> struct int_shifted_blocks_and_borrow_states_memory {
   bool gpu_memory_allocated;
 
   int_shifted_blocks_and_borrow_states_memory(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, int_radix_params params, uint32_t num_radix_blocks,
       uint32_t num_many_lut, uint32_t grouping_size, bool allocate_gpu_memory,
       uint64_t &size_tracker) {
@@ -2694,7 +2694,7 @@ template <typename Torus> struct int_shifted_blocks_and_borrow_states_memory {
   };
 
   // needed for the division to update the lut indexes
-  void update_lut_indexes(cudaStream_t const *streams,
+  void update_lut_indexes(hipStream_t const *streams,
                           uint32_t const *gpu_indexes, Torus *new_lut_indexes,
                           uint32_t new_num_blocks) {
     Torus *lut_indexes = luts_array_first_step->get_lut_indexes(0, 0);
@@ -2703,7 +2703,7 @@ template <typename Torus> struct int_shifted_blocks_and_borrow_states_memory {
         streams[0], gpu_indexes[0], gpu_memory_allocated);
     luts_array_first_step->broadcast_lut(streams, gpu_indexes);
   }
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     release_radix_ciphertext_async(streams[0], gpu_indexes[0],
@@ -2740,16 +2740,16 @@ template <typename Torus> struct int_borrow_prop_memory {
   int_radix_params params;
 
   uint32_t active_gpu_count;
-  cudaStream_t *sub_streams_1;
-  cudaStream_t *sub_streams_2;
+  hipStream_t *sub_streams_1;
+  hipStream_t *sub_streams_2;
 
-  cudaEvent_t *incoming_events;
-  cudaEvent_t *outgoing_events1;
-  cudaEvent_t *outgoing_events2;
+  hipEvent_t *incoming_events;
+  hipEvent_t *outgoing_events1;
+  hipEvent_t *outgoing_events2;
 
   uint32_t compute_overflow;
   bool gpu_memory_allocated;
-  int_borrow_prop_memory(cudaStream_t const *streams,
+  int_borrow_prop_memory(hipStream_t const *streams,
                          uint32_t const *gpu_indexes, uint32_t gpu_count,
                          int_radix_params params, uint32_t num_radix_blocks,
                          uint32_t compute_overflow_in, bool allocate_gpu_memory,
@@ -2823,20 +2823,20 @@ template <typename Torus> struct int_borrow_prop_memory {
 
     active_gpu_count = get_active_gpu_count(num_radix_blocks, gpu_count);
     sub_streams_1 =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     sub_streams_2 =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     for (uint j = 0; j < active_gpu_count; j++) {
       sub_streams_1[j] = cuda_create_stream(gpu_indexes[j]);
       sub_streams_2[j] = cuda_create_stream(gpu_indexes[j]);
     }
 
     incoming_events =
-        (cudaEvent_t *)malloc(active_gpu_count * sizeof(cudaEvent_t));
+        (hipEvent_t *)malloc(active_gpu_count * sizeof(hipEvent_t));
     outgoing_events1 =
-        (cudaEvent_t *)malloc(active_gpu_count * sizeof(cudaEvent_t));
+        (hipEvent_t *)malloc(active_gpu_count * sizeof(hipEvent_t));
     outgoing_events2 =
-        (cudaEvent_t *)malloc(active_gpu_count * sizeof(cudaEvent_t));
+        (hipEvent_t *)malloc(active_gpu_count * sizeof(hipEvent_t));
     for (uint j = 0; j < active_gpu_count; j++) {
       incoming_events[j] = cuda_create_event(gpu_indexes[j]);
       outgoing_events1[j] = cuda_create_event(gpu_indexes[j]);
@@ -2845,7 +2845,7 @@ template <typename Torus> struct int_borrow_prop_memory {
   };
 
   // needed for the division to update the lut indexes
-  void update_lut_indexes(cudaStream_t const *streams,
+  void update_lut_indexes(hipStream_t const *streams,
                           uint32_t const *gpu_indexes,
                           Torus *first_indexes_for_div,
                           Torus *second_indexes_for_div, Torus *scalars_for_div,
@@ -2856,7 +2856,7 @@ template <typename Torus> struct int_borrow_prop_memory {
         streams, gpu_indexes, second_indexes_for_div, scalars_for_div,
         new_num_blocks);
   }
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     shifted_blocks_borrow_state_mem->release(streams, gpu_indexes, gpu_count);
@@ -2901,12 +2901,12 @@ template <typename Torus> struct int_zero_out_if_buffer {
 
   CudaRadixCiphertextFFI *tmp;
 
-  cudaStream_t *true_streams;
-  cudaStream_t *false_streams;
+  hipStream_t *true_streams;
+  hipStream_t *false_streams;
   uint32_t active_gpu_count;
   bool gpu_memory_allocated;
 
-  int_zero_out_if_buffer(cudaStream_t const *streams,
+  int_zero_out_if_buffer(hipStream_t const *streams,
                          uint32_t const *gpu_indexes, uint32_t gpu_count,
                          int_radix_params params, uint32_t num_radix_blocks,
                          bool allocate_gpu_memory, uint64_t &size_tracker) {
@@ -2920,15 +2920,15 @@ template <typename Torus> struct int_zero_out_if_buffer {
         params.big_lwe_dimension, size_tracker, allocate_gpu_memory);
     // We may use a different stream to allow concurrent operation
     true_streams =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     false_streams =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     for (uint j = 0; j < active_gpu_count; j++) {
       true_streams[j] = cuda_create_stream(gpu_indexes[j]);
       false_streams[j] = cuda_create_stream(gpu_indexes[j]);
     }
   }
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     release_radix_ciphertext_async(streams[0], gpu_indexes[0], tmp,
                                    gpu_memory_allocated);
@@ -2959,7 +2959,7 @@ template <typename Torus> struct int_mul_memory {
   bool boolean_mul = false;
   bool gpu_memory_allocated;
 
-  int_mul_memory(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  int_mul_memory(hipStream_t const *streams, uint32_t const *gpu_indexes,
                  uint32_t gpu_count, int_radix_params params,
                  bool const is_boolean_left, bool const is_boolean_right,
                  uint32_t num_radix_blocks, bool allocate_gpu_memory,
@@ -3072,7 +3072,7 @@ template <typename Torus> struct int_mul_memory {
         requested_flag, uses_carry, allocate_gpu_memory, size_tracker);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     if (boolean_mul) {
@@ -3115,7 +3115,7 @@ template <typename Torus> struct int_logical_scalar_shift_buffer {
   bool gpu_memory_allocated;
 
   int_logical_scalar_shift_buffer(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, SHIFT_OR_ROTATE_TYPE shift_type,
       int_radix_params params, uint32_t num_radix_blocks,
       bool allocate_gpu_memory, uint64_t &size_tracker) {
@@ -3198,7 +3198,7 @@ template <typename Torus> struct int_logical_scalar_shift_buffer {
   }
 
   int_logical_scalar_shift_buffer(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, SHIFT_OR_ROTATE_TYPE shift_type,
       int_radix_params params, uint32_t num_radix_blocks,
       bool allocate_gpu_memory, CudaRadixCiphertextFFI *pre_allocated_buffer,
@@ -3280,7 +3280,7 @@ template <typename Torus> struct int_logical_scalar_shift_buffer {
       lut_buffers_bivariate.push_back(cur_lut_bivariate);
     }
   }
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     for (auto &buffer : lut_buffers_bivariate) {
       buffer->release(streams, gpu_indexes, gpu_count);
@@ -3306,13 +3306,13 @@ template <typename Torus> struct int_arithmetic_scalar_shift_buffer {
 
   CudaRadixCiphertextFFI *tmp_rotated;
 
-  cudaStream_t *local_streams_1;
-  cudaStream_t *local_streams_2;
+  hipStream_t *local_streams_1;
+  hipStream_t *local_streams_2;
   uint32_t active_gpu_count;
   bool gpu_memory_allocated;
 
   int_arithmetic_scalar_shift_buffer(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, SHIFT_OR_ROTATE_TYPE shift_type,
       int_radix_params params, uint32_t num_radix_blocks,
       bool allocate_gpu_memory, uint64_t &size_tracker) {
@@ -3322,9 +3322,9 @@ template <typename Torus> struct int_arithmetic_scalar_shift_buffer {
     // block twice: once to shift it, once to compute the padding block to be
     // copied onto all blocks to the left of the last rotated block
     local_streams_1 =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     local_streams_2 =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     for (uint j = 0; j < active_gpu_count; j++) {
       local_streams_1[j] = cuda_create_stream(gpu_indexes[j]);
       local_streams_2[j] = cuda_create_stream(gpu_indexes[j]);
@@ -3449,7 +3449,7 @@ template <typename Torus> struct int_arithmetic_scalar_shift_buffer {
     }
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     for (uint j = 0; j < active_gpu_count; j++) {
       cuda_destroy_stream(local_streams_1[j], gpu_indexes[j]);
@@ -3485,7 +3485,7 @@ template <typename Torus> struct int_cmux_buffer {
   int_radix_params params;
   bool allocate_gpu_memory;
   bool gpu_memory_allocated;
-  int_cmux_buffer(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  int_cmux_buffer(hipStream_t const *streams, uint32_t const *gpu_indexes,
                   uint32_t gpu_count,
                   std::function<Torus(Torus)> predicate_lut_f,
                   int_radix_params params, uint32_t num_radix_blocks,
@@ -3562,7 +3562,7 @@ template <typename Torus> struct int_cmux_buffer {
     message_extract_lut->broadcast_lut(streams, gpu_indexes);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     predicate_lut->release(streams, gpu_indexes, gpu_count);
     delete predicate_lut;
@@ -3595,7 +3595,7 @@ template <typename Torus> struct int_are_all_block_true_buffer {
   int_radix_lut<Torus> *is_max_value;
   bool gpu_memory_allocated;
 
-  int_are_all_block_true_buffer(cudaStream_t const *streams,
+  int_are_all_block_true_buffer(hipStream_t const *streams,
                                 uint32_t const *gpu_indexes, uint32_t gpu_count,
                                 COMPARISON_TYPE op, int_radix_params params,
                                 uint32_t num_radix_blocks,
@@ -3634,7 +3634,7 @@ template <typename Torus> struct int_are_all_block_true_buffer {
     is_max_value->broadcast_lut(streams, gpu_indexes);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     release_radix_ciphertext_async(streams[0], gpu_indexes[0], tmp_out,
                                    gpu_memory_allocated);
@@ -3658,7 +3658,7 @@ template <typename Torus> struct int_comparison_eq_buffer {
   int_are_all_block_true_buffer<Torus> *are_all_block_true_buffer;
   bool gpu_memory_allocated;
 
-  int_comparison_eq_buffer(cudaStream_t const *streams,
+  int_comparison_eq_buffer(hipStream_t const *streams,
                            uint32_t const *gpu_indexes, uint32_t gpu_count,
                            COMPARISON_TYPE op, int_radix_params params,
                            uint32_t num_radix_blocks, bool allocate_gpu_memory,
@@ -3732,7 +3732,7 @@ template <typename Torus> struct int_comparison_eq_buffer {
     scalar_comparison_luts->broadcast_lut(streams, gpu_indexes);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     operator_lut->release(streams, gpu_indexes, gpu_count);
     delete operator_lut;
@@ -3760,7 +3760,7 @@ template <typename Torus> struct int_tree_sign_reduction_buffer {
   bool gpu_memory_allocated;
 
   int_tree_sign_reduction_buffer(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, std::function<Torus(Torus)> operator_f,
       int_radix_params params, uint32_t num_radix_blocks,
       bool allocate_gpu_memory, uint64_t &size_tracker) {
@@ -3806,7 +3806,7 @@ template <typename Torus> struct int_tree_sign_reduction_buffer {
     tree_inner_leaf_lut->broadcast_lut(streams, gpu_indexes);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     release_radix_ciphertext_async(streams[0], gpu_indexes[0], tmp_x,
                                    gpu_memory_allocated);
@@ -3839,7 +3839,7 @@ template <typename Torus> struct int_comparison_diff_buffer {
   int_radix_lut<Torus> *reduce_signs_lut;
   bool gpu_memory_allocated;
 
-  int_comparison_diff_buffer(cudaStream_t const *streams,
+  int_comparison_diff_buffer(hipStream_t const *streams,
                              uint32_t const *gpu_indexes, uint32_t gpu_count,
                              COMPARISON_TYPE op, int_radix_params params,
                              uint32_t num_radix_blocks,
@@ -3888,7 +3888,7 @@ template <typename Torus> struct int_comparison_diff_buffer {
         allocate_gpu_memory, size_tracker);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     release_radix_ciphertext_async(streams[0], gpu_indexes[0], tmp_packed,
                                    gpu_memory_allocated);
@@ -3937,12 +3937,12 @@ template <typename Torus> struct int_comparison_buffer {
 
   // Used for scalar comparisons
   int_radix_lut<Torus> *signed_msb_lut;
-  cudaStream_t *lsb_streams;
-  cudaStream_t *msb_streams;
+  hipStream_t *lsb_streams;
+  hipStream_t *msb_streams;
   uint32_t active_gpu_count;
   bool gpu_memory_allocated;
 
-  int_comparison_buffer(cudaStream_t const *streams,
+  int_comparison_buffer(hipStream_t const *streams,
                         uint32_t const *gpu_indexes, uint32_t gpu_count,
                         COMPARISON_TYPE op, int_radix_params params,
                         uint32_t num_radix_blocks, bool is_signed,
@@ -3957,9 +3957,9 @@ template <typename Torus> struct int_comparison_buffer {
     identity_lut_f = [](Torus x) -> Torus { return x; };
 
     lsb_streams =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     msb_streams =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     for (uint j = 0; j < active_gpu_count; j++) {
       lsb_streams[j] = cuda_create_stream(gpu_indexes[j]);
       msb_streams[j] = cuda_create_stream(gpu_indexes[j]);
@@ -4097,7 +4097,7 @@ template <typename Torus> struct int_comparison_buffer {
     }
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     switch (op) {
     case COMPARISON_TYPE::MAX:
@@ -4171,10 +4171,10 @@ template <typename Torus> struct unsigned_int_div_rem_memory {
   int_radix_lut<Torus> **merge_overflow_flags_luts;
 
   // sub streams
-  cudaStream_t *sub_streams_1;
-  cudaStream_t *sub_streams_2;
-  cudaStream_t *sub_streams_3;
-  cudaStream_t *sub_streams_4;
+  hipStream_t *sub_streams_1;
+  hipStream_t *sub_streams_2;
+  hipStream_t *sub_streams_3;
+  hipStream_t *sub_streams_4;
 
   // temporary device buffers
   CudaRadixCiphertextFFI *remainder1;
@@ -4203,7 +4203,7 @@ template <typename Torus> struct unsigned_int_div_rem_memory {
 
   // allocate and initialize if needed, temporary arrays used to calculate
   // cuda integer div_rem operation
-  void init_temporary_buffers(cudaStream_t const *streams,
+  void init_temporary_buffers(hipStream_t const *streams,
                               uint32_t const *gpu_indexes, uint32_t gpu_count,
                               uint32_t num_blocks, bool allocate_gpu_memory,
                               uint64_t &size_tracker) {
@@ -4285,7 +4285,7 @@ template <typename Torus> struct unsigned_int_div_rem_memory {
   }
 
   // initialize lookup tables for div_rem operation
-  void init_lookup_tables(cudaStream_t const *streams,
+  void init_lookup_tables(hipStream_t const *streams,
                           uint32_t const *gpu_indexes, uint32_t gpu_count,
                           uint32_t num_blocks, bool allocate_gpu_memory,
                           uint64_t &size_tracker) {
@@ -4449,7 +4449,7 @@ template <typename Torus> struct unsigned_int_div_rem_memory {
     }
   }
 
-  unsigned_int_div_rem_memory(cudaStream_t const *streams,
+  unsigned_int_div_rem_memory(hipStream_t const *streams,
                               uint32_t const *gpu_indexes, uint32_t gpu_count,
                               int_radix_params params, uint32_t num_blocks,
                               bool allocate_gpu_memory,
@@ -4487,13 +4487,13 @@ template <typename Torus> struct unsigned_int_div_rem_memory {
                            allocate_gpu_memory, size_tracker);
 
     sub_streams_1 =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     sub_streams_2 =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     sub_streams_3 =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     sub_streams_4 =
-        (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+        (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
     for (uint j = 0; j < active_gpu_count; j++) {
       sub_streams_1[j] = cuda_create_stream(gpu_indexes[j]);
       sub_streams_2[j] = cuda_create_stream(gpu_indexes[j]);
@@ -4502,7 +4502,7 @@ template <typename Torus> struct unsigned_int_div_rem_memory {
     }
   }
 
-  void create_indexes_for_overflow_sub(cudaStream_t const *streams,
+  void create_indexes_for_overflow_sub(hipStream_t const *streams,
                                        uint32_t const *gpu_indexes,
                                        uint32_t num_blocks, uint32_t group_size,
                                        bool use_seq, bool allocate_gpu_memory,
@@ -4598,7 +4598,7 @@ template <typename Torus> struct unsigned_int_div_rem_memory {
     free(h_scalar);
   };
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     uint32_t num_bits_in_message = 31 - __builtin_clz(params.message_modulus);
 
@@ -4755,7 +4755,7 @@ template <typename Torus> struct int_bitop_buffer {
   BITOP_TYPE op;
   bool gpu_memory_allocated;
 
-  int_bitop_buffer(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  int_bitop_buffer(hipStream_t const *streams, uint32_t const *gpu_indexes,
                    uint32_t gpu_count, BITOP_TYPE op, int_radix_params params,
                    uint32_t num_radix_blocks, bool allocate_gpu_memory,
                    uint64_t &size_tracker) {
@@ -4824,7 +4824,7 @@ template <typename Torus> struct int_bitop_buffer {
     }
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     lut->release(streams, gpu_indexes, gpu_count);
     delete lut;
@@ -4842,7 +4842,7 @@ template <typename Torus> struct int_scalar_mul_buffer {
   bool gpu_memory_allocated;
   uint32_t num_ciphertext_bits;
 
-  int_scalar_mul_buffer(cudaStream_t const *streams,
+  int_scalar_mul_buffer(hipStream_t const *streams,
                         uint32_t const *gpu_indexes, uint32_t gpu_count,
                         int_radix_params params, uint32_t num_radix_blocks,
                         uint32_t num_scalar_bits, bool allocate_gpu_memory,
@@ -4897,7 +4897,7 @@ template <typename Torus> struct int_scalar_mul_buffer {
     }
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     release_radix_ciphertext_async(streams[0], gpu_indexes[0],
                                    all_shifted_buffer, gpu_memory_allocated);
@@ -4928,7 +4928,7 @@ template <typename Torus> struct int_abs_buffer {
   CudaRadixCiphertextFFI *mask;
   bool allocate_gpu_memory;
 
-  int_abs_buffer(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  int_abs_buffer(hipStream_t const *streams, uint32_t const *gpu_indexes,
                  uint32_t gpu_count, int_radix_params params,
                  uint32_t num_radix_blocks, bool allocate_gpu_memory,
                  uint64_t &size_tracker) {
@@ -4952,7 +4952,7 @@ template <typename Torus> struct int_abs_buffer {
         params.big_lwe_dimension, size_tracker, allocate_gpu_memory);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     arithmetic_scalar_shift_mem->release(streams, gpu_indexes, gpu_count);
     scp_mem->release(streams, gpu_indexes, gpu_count);
@@ -4986,9 +4986,9 @@ template <typename Torus> struct int_div_rem_memory {
   int_radix_lut<Torus> *compare_signed_bits_lut;
 
   // sub streams
-  cudaStream_t *sub_streams_1;
-  cudaStream_t *sub_streams_2;
-  cudaStream_t *sub_streams_3;
+  hipStream_t *sub_streams_1;
+  hipStream_t *sub_streams_2;
+  hipStream_t *sub_streams_3;
 
   // temporary device buffers
   CudaRadixCiphertextFFI *positive_numerator;
@@ -4998,7 +4998,7 @@ template <typename Torus> struct int_div_rem_memory {
   CudaRadixCiphertextFFI *negated_remainder;
   bool gpu_memory_allocated;
 
-  int_div_rem_memory(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  int_div_rem_memory(hipStream_t const *streams, uint32_t const *gpu_indexes,
                      uint32_t gpu_count, int_radix_params params,
                      bool is_signed, uint32_t num_blocks,
                      bool allocate_gpu_memory, uint64_t &size_tracker) {
@@ -5070,11 +5070,11 @@ template <typename Torus> struct int_div_rem_memory {
 
       // init sub streams
       sub_streams_1 =
-          (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+          (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
       sub_streams_2 =
-          (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+          (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
       sub_streams_3 =
-          (cudaStream_t *)malloc(active_gpu_count * sizeof(cudaStream_t));
+          (hipStream_t *)malloc(active_gpu_count * sizeof(hipStream_t));
       for (uint j = 0; j < active_gpu_count; j++) {
         sub_streams_1[j] = cuda_create_stream(gpu_indexes[j]);
         sub_streams_2[j] = cuda_create_stream(gpu_indexes[j]);
@@ -5104,7 +5104,7 @@ template <typename Torus> struct int_div_rem_memory {
     }
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
     unsigned_mem->release(streams, gpu_indexes, gpu_count);
     delete unsigned_mem;
@@ -5170,7 +5170,7 @@ template <typename Torus> struct int_scalar_mul_high_buffer {
 
   CudaRadixCiphertextFFI *tmp;
 
-  int_scalar_mul_high_buffer(cudaStream_t const *streams,
+  int_scalar_mul_high_buffer(hipStream_t const *streams,
                              uint32_t const *gpu_indexes, uint32_t gpu_count,
                              const int_radix_params params,
                              uint32_t num_radix_blocks,
@@ -5195,7 +5195,7 @@ template <typename Torus> struct int_scalar_mul_high_buffer {
         params.big_lwe_dimension, size_tracker, allocate_gpu_memory);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     logical_scalar_shift_mem->release(streams, gpu_indexes, gpu_count);
@@ -5218,7 +5218,7 @@ template <typename Torus> struct int_sub_and_propagate {
 
   int_sc_prop_memory<Torus> *sc_prop_mem;
 
-  int_sub_and_propagate(cudaStream_t const *streams,
+  int_sub_and_propagate(hipStream_t const *streams,
                         uint32_t const *gpu_indexes, uint32_t gpu_count,
                         const int_radix_params params,
                         uint32_t num_radix_blocks, uint32_t requested_flag_in,
@@ -5237,7 +5237,7 @@ template <typename Torus> struct int_sub_and_propagate {
         params.big_lwe_dimension, size_tracker, allocate_gpu_memory);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     sc_prop_mem->release(streams, gpu_indexes, gpu_count);
@@ -5260,7 +5260,7 @@ template <typename Torus> struct int_extend_radix_with_sign_msb_buffer {
   CudaRadixCiphertextFFI *padding_block = nullptr;
 
   int_extend_radix_with_sign_msb_buffer(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, const int_radix_params params,
       uint32_t num_radix_blocks, uint32_t num_additional_blocks,
       const bool allocate_gpu_memory, uint64_t &size_tracker) {
@@ -5301,7 +5301,7 @@ template <typename Torus> struct int_extend_radix_with_sign_msb_buffer {
     }
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     if (lut != nullptr) {
@@ -5332,7 +5332,7 @@ template <typename Torus> struct int_unsigned_scalar_div_mem {
   int_sc_prop_memory<Torus> *scp_mem = nullptr;
   int_sub_and_propagate<Torus> *sub_and_propagate_mem = nullptr;
 
-  int_unsigned_scalar_div_mem(cudaStream_t const *streams,
+  int_unsigned_scalar_div_mem(hipStream_t const *streams,
                               uint32_t const *gpu_indexes, uint32_t gpu_count,
                               const int_radix_params params,
                               uint32_t num_radix_blocks,
@@ -5389,7 +5389,7 @@ template <typename Torus> struct int_unsigned_scalar_div_mem {
     }
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     if (logical_scalar_shift_mem != nullptr) {
@@ -5427,7 +5427,7 @@ template <typename Torus> struct int_signed_scalar_mul_high_buffer {
   CudaRadixCiphertextFFI *tmp;
 
   int_signed_scalar_mul_high_buffer(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, const int_radix_params params,
       uint32_t num_radix_blocks, uint32_t num_scalar_bits,
       const bool allocate_gpu_memory, uint64_t &size_tracker) {
@@ -5453,7 +5453,7 @@ template <typename Torus> struct int_signed_scalar_mul_high_buffer {
         num_radix_blocks, allocate_gpu_memory, size_tracker);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     logical_scalar_shift_mem->release(streams, gpu_indexes, gpu_count);
@@ -5485,7 +5485,7 @@ template <typename Torus> struct int_signed_scalar_div_mem {
   int_sc_prop_memory<Torus> *scp_mem = nullptr;
   int_sub_and_propagate<Torus> *sub_and_propagate_mem = nullptr;
 
-  int_signed_scalar_div_mem(cudaStream_t const *streams,
+  int_signed_scalar_div_mem(hipStream_t const *streams,
                             uint32_t const *gpu_indexes, uint32_t gpu_count,
                             const int_radix_params params,
                             uint32_t num_radix_blocks,
@@ -5553,7 +5553,7 @@ template <typename Torus> struct int_signed_scalar_div_mem {
     }
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     if (arithmetic_scalar_shift_mem != nullptr) {
@@ -5601,7 +5601,7 @@ template <typename Torus> struct int_unsigned_scalar_div_rem_buffer {
   int_sub_and_propagate<Torus> *sub_and_propagate_mem = nullptr;
 
   int_unsigned_scalar_div_rem_buffer(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, const int_radix_params params,
       uint32_t num_radix_blocks, const CudaScalarDivisorFFI *scalar_divisor_ffi,
       uint32_t const active_bits_divisor, const bool allocate_gpu_memory,
@@ -5636,7 +5636,7 @@ template <typename Torus> struct int_unsigned_scalar_div_rem_buffer {
     }
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     release_radix_ciphertext_async(streams[0], gpu_indexes[0], numerator_ct,
@@ -5674,7 +5674,7 @@ template <typename Torus> struct int_signed_scalar_div_rem_buffer {
   int_sc_prop_memory<Torus> *scp_mem;
 
   int_signed_scalar_div_rem_buffer(
-      cudaStream_t const *streams, uint32_t const *gpu_indexes,
+      hipStream_t const *streams, uint32_t const *gpu_indexes,
       uint32_t gpu_count, const int_radix_params params,
       uint32_t num_radix_blocks, const CudaScalarDivisorFFI *scalar_divisor_ffi,
       uint32_t const active_bits_divisor, const bool allocate_gpu_memory,
@@ -5718,7 +5718,7 @@ template <typename Torus> struct int_signed_scalar_div_rem_buffer {
         allocate_gpu_memory, size_tracker);
   }
 
-  void release(cudaStream_t const *streams, uint32_t const *gpu_indexes,
+  void release(hipStream_t const *streams, uint32_t const *gpu_indexes,
                uint32_t gpu_count) {
 
     release_radix_ciphertext_async(streams[0], gpu_indexes[0], numerator_ct,

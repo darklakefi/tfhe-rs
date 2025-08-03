@@ -45,12 +45,12 @@ template <typename Torus> bool is_power_of_2(Torus value) {
 }
 
 template <typename Torus, class params>
-void host_lwe_expand(cudaStream_t stream, int gpu_index, Torus *lwe_array_out,
+void host_lwe_expand(hipStream_t stream, int gpu_index, Torus *lwe_array_out,
                      const Torus *lwe_compact_array_in, uint32_t num_lwes,
                      const uint32_t *lwe_compact_input_indexes,
                      const uint32_t *output_body_id_per_compact_list) {
   // Set the GPU device
-  cudaSetDevice(gpu_index);
+  hipSetDevice(gpu_index);
 
   uint32_t threads_per_block = params::degree / params::opt;
   uint32_t num_blocks = num_lwes;
@@ -66,6 +66,6 @@ void host_lwe_expand(cudaStream_t stream, int gpu_index, Torus *lwe_array_out,
   lwe_expand<Torus, params><<<num_blocks, threads_per_block, 0, stream>>>(
       lwe_compact_array_in, lwe_array_out, lwe_compact_input_indexes,
       output_body_id_per_compact_list);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 #endif // EXPAND_CUH

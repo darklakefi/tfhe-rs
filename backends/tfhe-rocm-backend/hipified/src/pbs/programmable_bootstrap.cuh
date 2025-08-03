@@ -3,7 +3,7 @@
 
 #include "bootstrapping_key.cuh"
 #include "ciphertext.h"
-#include "cooperative_groups.h"
+#include "hip/hip_cooperative_groups.h"
 #include "device.h"
 #include "fft/bnsmfft.cuh"
 #include "helper_multi_gpu.h"
@@ -141,7 +141,7 @@ __device__ void mul_ggsw_glwe_in_fourier_domain_128(
 
 template <typename Torus>
 void execute_pbs_async(
-    cudaStream_t const *streams, uint32_t const *gpu_indexes,
+    hipStream_t const *streams, uint32_t const *gpu_indexes,
     uint32_t gpu_count, const LweArrayVariant<Torus> &lwe_array_out,
     const LweArrayVariant<Torus> &lwe_output_indexes,
     const std::vector<Torus *> lut_vec,
@@ -273,7 +273,7 @@ void execute_pbs_async(
 }
 
 template <typename Torus>
-void execute_scratch_pbs(cudaStream_t stream, uint32_t gpu_index,
+void execute_scratch_pbs(hipStream_t stream, uint32_t gpu_index,
                          int8_t **pbs_buffer, uint32_t glwe_dimension,
                          uint32_t lwe_dimension, uint32_t polynomial_size,
                          uint32_t level_count, uint32_t grouping_factor,

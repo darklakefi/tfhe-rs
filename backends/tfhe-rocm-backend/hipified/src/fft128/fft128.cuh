@@ -504,10 +504,10 @@ __host__ void host_fourier_transform_forward_as_integer_f128(
   // configure shared memory for batch fft kernel
   if (full_sm) {
     check_cuda_error(hipFuncSetAttribute(
-        batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
+        (const void *)batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
         hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
     check_cuda_error(hipFuncSetCacheConfig(
-        batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
+        (const void *)batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
         hipFuncCachePreferShared));
   }
 
@@ -580,10 +580,10 @@ __host__ void host_fourier_transform_forward_as_torus_f128(
   // configure shared memory for batch fft kernel
   if (full_sm) {
     check_cuda_error(hipFuncSetAttribute(
-        batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
+        (const void *)batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
         hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
     check_cuda_error(hipFuncSetCacheConfig(
-        batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
+        (const void *)batch_NSMFFT_128<FFTDegree<params, ForwardFFT>, FULLSM>,
         hipFuncCachePreferShared));
   }
 
@@ -660,10 +660,10 @@ __host__ void host_fourier_transform_backward_as_torus_f128(
   // configure shared memory for batch fft kernel
   if (full_sm) {
     check_cuda_error(hipFuncSetAttribute(
-        batch_NSMFFT_128<FFTDegree<params, BackwardFFT>, FULLSM>,
+        (const void *)batch_NSMFFT_128<FFTDegree<params, BackwardFFT>, FULLSM>,
         hipFuncAttributeMaxDynamicSharedMemorySize, shared_memory_size));
     check_cuda_error(hipFuncSetCacheConfig(
-        batch_NSMFFT_128<FFTDegree<params, BackwardFFT>, FULLSM>,
+        (const void *)batch_NSMFFT_128<FFTDegree<params, BackwardFFT>, FULLSM>,
         hipFuncCachePreferShared));
     batch_NSMFFT_128<FFTDegree<params, BackwardFFT>, FULLSM>
         <<<grid_size, block_size, shared_memory_size, stream>>>(

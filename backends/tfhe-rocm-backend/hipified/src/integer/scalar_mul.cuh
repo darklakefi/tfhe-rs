@@ -161,7 +161,7 @@ __host__ void host_integer_small_scalar_mul_radix(
   device_small_scalar_radix_multiplication<<<grid, thds, 0, streams[0]>>>(
       (T *)output_lwe_array->ptr, (T *)input_lwe_array->ptr, scalar,
       lwe_dimension, num_radix_blocks);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 
   for (int i = 0; i < num_radix_blocks; i++) {
     output_lwe_array->noise_levels[i] =

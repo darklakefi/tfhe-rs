@@ -116,7 +116,7 @@ __global__ void modulus_switch_inplace(Torus *array, int size,
 }
 
 template <typename Torus>
-__host__ void host_modulus_switch_inplace(cudaStream_t stream,
+__host__ void host_modulus_switch_inplace(hipStream_t stream,
                                           uint32_t gpu_index, Torus *array,
                                           int size, uint32_t log_modulus) {
   cuda_set_device(gpu_index);
@@ -126,7 +126,7 @@ __host__ void host_modulus_switch_inplace(cudaStream_t stream,
 
   modulus_switch_inplace<Torus>
       <<<num_blocks, num_threads, 0, stream>>>(array, size, log_modulus);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 template <typename T>
@@ -276,7 +276,7 @@ __global__ void __launch_bounds__(512)
 
 template <typename Torus>
 __host__ void host_improve_noise_modulus_switch(
-    cudaStream_t stream, uint32_t gpu_index, Torus *array_out,
+    hipStream_t stream, uint32_t gpu_index, Torus *array_out,
     Torus const *array_in, uint64_t const *indexes, const Torus *zeros,
     uint32_t lwe_size, uint32_t num_lwes, const uint32_t num_zeros,
     const double input_variance, const double r_sigma, const double bound,
@@ -299,7 +299,7 @@ __host__ void host_improve_noise_modulus_switch(
   improve_noise_modulus_switch<Torus><<<num_blocks, num_threads, 0, stream>>>(
       array_out, array_in, indexes, zeros, lwe_size, num_zeros, input_variance,
       r_sigma, bound, log_modulus);
-  check_cuda_error(cudaGetLastError());
+  check_cuda_error(hipGetLastError());
 }
 
 #endif // CNCRT_TORUS_H
