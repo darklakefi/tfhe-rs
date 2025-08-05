@@ -1,6 +1,6 @@
 use std::ffi::c_void;
 
-#[link(name = "tfhe_cuda_backend", kind = "static")]
+#[link(name = "tfhe_rocm_backend", kind = "static")]
 extern "C" {
 
     pub fn cuda_create_stream(gpu_index: u32) -> *mut c_void;

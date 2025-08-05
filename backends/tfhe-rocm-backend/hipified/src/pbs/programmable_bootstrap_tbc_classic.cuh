@@ -48,7 +48,8 @@ __global__ void device_programmable_bootstrap_tbc(
     uint64_t device_memory_size_per_block, bool support_dsm,
     uint32_t num_many_lut, uint32_t lut_stride, bool uses_noise_reduction) {
 
-  cluster_group cluster = this_cluster();
+  // ROCm: Use grid_group instead of cluster_group
+  grid_group grid = this_grid();
 
   // We use shared memory for the polynomials that are used often during the
   // bootstrap, since shared memory is kept in L1 cache and accessing it is
@@ -139,8 +140,9 @@ __global__ void device_programmable_bootstrap_tbc(
     __syncthreads();
 
     // Perform G^-1(ACC) * GGSW -> GLWE
-    mul_ggsw_glwe_in_fourier_domain<cluster_group, params>(
-        accumulator_fft, block_join_buffer, bootstrapping_key, i, cluster,
+    // ROCm: Use grid_group instead of cluster_group
+    mul_ggsw_glwe_in_fourier_domain<grid_group, params>(
+        accumulator_fft, block_join_buffer, bootstrapping_key, i, grid,
         support_dsm);
     NSMFFT_inverse<HalfDegree<params>>(accumulator_fft);
     __syncthreads();

@@ -20,7 +20,9 @@ set_target_properties(tfhe_rocm_backend PROPERTIES
     HIP_SEPARABLE_COMPILATION ON
     HIP_RESOLVE_DEVICE_SYMBOLS ON
     POSITION_INDEPENDENT_CODE ON
-    LINKER_LANGUAGE HIP)
+    LINKER_LANGUAGE HIP
+    HIP_STANDARD 17
+    HIP_STANDARD_REQUIRED ON)
 
 # Link ROCm/HIP libraries
 target_link_libraries(tfhe_rocm_backend PUBLIC hip::host OpenMP::OpenMP_CXX)

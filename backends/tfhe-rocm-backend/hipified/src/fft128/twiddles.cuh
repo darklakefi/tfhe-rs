@@ -1,6 +1,8 @@
 #ifndef CUDA_FFT128_TWIDDLES_CUH
 #define CUDA_FFT128_TWIDDLES_CUH
 
+#include <hip/hip_runtime.h>
+
 /*
  * 'negtwiddles' are stored in device memory to profit caching
  */

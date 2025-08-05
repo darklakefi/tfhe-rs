@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for:*)",
+      "Bash(do)",
+      "Bash(if [ -f \"$file\" ])",
+      "Bash(then)",
+      "Bash(echo \"Processing $file\")",
+      "Bash(sed:*)",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(grep:*)",
+      "Bash(git checkout:*)",
+      "Bash(python3:*)",
+      "Bash(cargo build:*)",
+      "Bash(find:*)"
+    ],
+    "deny": []
+  }
+}
