@@ -91,13 +91,16 @@ bytemuck = { workspace = true }
 
 tfhe-hpu-backend = { version = "0.2", path = "../backends/tfhe-hpu-backend", optional = true }
 
+tfhe-rocm-backend = { version = "0.1", path = "../backends/tfhe-rocm-backend", optional = true }
+
 [features]
 boolean = []
 shortint = ["dep:sha3"]
 integer = ["shortint", "dep:strum"]
 strings = ["integer"]
 internal-keycache = ["dep:fs2"]
-gpu = ["dep:tfhe-cuda-backend", "shortint"]
+gpu-rocm = ["shortint", "dep:tfhe-rocm-backend"]
+gpu = ["dep:tfhe-cuda-backend", "shortint", "dep:tfhe-rocm-backend"]
 gpu-experimental-multi-arch = [
     "gpu",
     "tfhe-cuda-backend/experimental-multi-arch",
